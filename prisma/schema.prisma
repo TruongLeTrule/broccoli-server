@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String  @id @default(uuid())
+  username       String  @unique
+  fullName       String
+  hashedPassword String
+  imgUrl         String?
+
+  mealPlans        MealPlan[]
+  userPhysicalStat UserPhysicalStat?
+}
+
+model UserPhysicalStat {
+  id         String     @id @default(uuid())
+  age        Int
+  gender     gender
+  height     Float
+  heightUnit heightUnit @default(cm)
+  weightInKg Float
+  tdee       Int
+
+  activityLevel   ActivityLevel? @relation(fields: [activityLevelId], references: [id])
+  activityLevelId Int
+  user            User           @relation(fields: [userId], references: [id])
+  userId          String         @unique
+}
+
+model ActivityLevel {
+  id                Int    @id @default(autoincrement())
+  activityLevelType String
+  coefficientValue  Float
+
+  userPhysicalStats UserPhysicalStat[]
+}
+
+model MealPlan {
+  id            String   @id @default(uuid())
+  appliedDate   DateTime
+  totalCalories Int
+
+  chosenMeals ChosenMeal[]
+  users       User?        @relation(fields: [userId], references: [id])
+  userId      String
+}
+
+model ChosenMeal {
+  mealTime           mealTime
+  chosenMealQuantity Float
+
+  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [id])
+  mealPlanId String
+  meal       Meal     @relation(fields: [mealId], references: [id])
+  mealId     Int
+
+  @@id([mealPlanId, mealTime])
+}
+
+model Meal {
+  id                 Int      @id @default(autoincrement())
+  mealName           String
+  caloriesPerServing Int
+  mealType           mealType @default(food)
+  imgURL             String?
+
+  mealIngredients MealIngredient[]
+  chosenMeals     ChosenMeal[]
+}
+
+model MealIngredient {
+  ingredientValue Float
+
+  ingredientUnitCovert IngredientUnitCovert @relation(fields: [ingredientUnit], references: [ingredientUnit])
+  ingredientUnit       ingredientUnit       @default(g)
+  meal                 Meal                 @relation(fields: [mealId], references: [id])
+  mealId               Int
+  ingredient           Ingredient           @relation(fields: [ingredientId], references: [id])
+  ingredientId         Int
+
+  @@id([mealId, ingredientId])
+}
+
+model IngredientUnitCovert {
+  ingredientUnit ingredientUnit @id
+  covertToGrams  Float
+
+  mealIngredients MealIngredient[]
+}
+
+model Ingredient {
+  id                       Int            @id @default(autoincrement())
+  ingredientName           String
+  ingredientCaloriesOn100g Int
+  ingredientType           ingredientType @default(meat)
+
+  ingredientNutrients IngredientNutrient[]
+  mealIngredients     MealIngredient[]
+}
+
+model IngredientNutrient {
+  nutrientValueOn100g Float
+
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  ingredientId Int
+  nutrient     Nutrient   @relation(fields: [nutrientId], references: [id])
+  nutrientId   Int
+
+  @@id([ingredientId, nutrientId])
+}
+
+model Nutrient {
+  id           Int          @id @default(autoincrement())
+  nutrientName String
+  nutrientType nutrientType @default(macro)
+  nutrientUnit nutrientUnit @default(g)
+
+  ingredientNutrients IngredientNutrient[]
+}
+
+enum nutrientType {
+  macro
+  micro
+}
+
+enum nutrientUnit {
+  g
+  mg
+  mcg
+}
+
+enum mealTime {
+  breakfast
+  lunch
+  dinner
+  snack
+}
+
+enum mealType {
+  food
+  fruit
+  drink
+}
+
+enum gender {
+  male
+  female
+  other
+}
+
+enum heightUnit {
+  m
+  cm
+}
+
+enum ingredientUnit {
+  g
+  tbsp // 18g
+  tsp // 6g
+  cup // 292g
+  dash // 0.4g
+}
+
+enum ingredientType {
+  meat
+  vegetable
+}
