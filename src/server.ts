@@ -1,6 +1,7 @@
 import 'express-async-errors';
 import dotenv from 'dotenv';
 import express from 'express';
+import morgan from 'morgan';
 
 // Import middlewares
 import cookieParser from 'cookie-parser';
@@ -15,6 +16,10 @@ import mealRoute from './routes/meal.route';
 dotenv.config();
 
 const app = express();
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
 // Middlewares
 app.use(express.json());

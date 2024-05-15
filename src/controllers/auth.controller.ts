@@ -18,11 +18,11 @@ const login = async (req: Request, res: Response) => {
   );
   if (!isPasswordValid) throw new NotFoundError('wrong username or password');
 
-  const token = createToken({ username });
+  const token = createToken({ userId: foundUser.id });
 
   res.cookie('token', token, {
     httpOnly: true,
-    expires: new Date(Date.now() + oneDay),
+    expires: new Date(Date.now() + oneDay * 30),
     secure: process.env.NODE_ENV === 'production',
   });
 
