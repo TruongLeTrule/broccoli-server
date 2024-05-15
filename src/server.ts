@@ -7,7 +7,6 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import errorHandlerMiddleware from './middlewares/errorHandler.middleware';
 import { NotFoundError } from './utils/customErrors';
-import { authenticationUser } from './middlewares/authenticate.middleware';
 
 // Import routes
 import authRoute from './routes/auth.route';
@@ -27,7 +26,7 @@ app.use(cookieParser());
 
 // Routes
 app.use('/api/v1/auth', authRoute);
-app.use('/api/v1/meal', authenticationUser, mealRoute);
+app.use('/api/v1/meal', mealRoute);
 
 // Error handlers
 app.use('*', (req, res) => {

@@ -13,9 +13,4 @@ const verifyToken = (token: string) => {
   return payload as JwtPayload;
 };
 
-const getTokenExp = (token: string) => {
-  const { exp } = jwt.decode(token) as JwtPayload;
-  return exp;
-};
-
-export { createToken, getTokenExp, verifyToken };
+export { createToken, verifyToken };

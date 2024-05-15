@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { UnauthenticatedError } from '../utils/customErrors';
-import { getTokenExp, verifyToken } from '../utils/token.util';
+import { verifyToken } from '../utils/token.util';
 
 export const authenticationUser = (
   req: Request,
