@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -14,8 +15,10 @@ model User {
   hashedPassword String
   imgUrl         String?
 
-  mealPlans        MealPlan[]
-  userPhysicalStat UserPhysicalStat?
+  mealPlans          ChosenMeal[]
+  createdMeals       Meal[]
+  createdIngredients Ingredient[]
+  userPhysicalStat   UserPhysicalStat?
 }
 
 model UserPhysicalStat {
@@ -35,56 +38,50 @@ model UserPhysicalStat {
 
 model ActivityLevel {
   id                Int    @id @default(autoincrement())
-  activityLevelType String
-  coefficientValue  Float
+  activityLevelType String @unique
 
   userPhysicalStats UserPhysicalStat[]
 }
 
-model MealPlan {
-  id            String   @id @default(uuid())
-  appliedDate   DateTime
-  totalCalories Int
-
-  chosenMeals ChosenMeal[]
-  users       User?        @relation(fields: [userId], references: [id])
-  userId      String
-}
-
 model ChosenMeal {
-  mealTime           mealTime
-  chosenMealQuantity Float
+  id          String   @id @default(uuid())
+  mealTime    mealTime
+  quantity    Float
+  appliedDate DateTime
 
-  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [id])
-  mealPlanId String
-  meal       Meal     @relation(fields: [mealId], references: [id])
-  mealId     Int
+  meal   Meal   @relation(fields: [mealId], references: [id])
+  mealId Int
+  users  User?  @relation(fields: [userId], references: [id])
+  userId String
 
-  @@id([mealPlanId, mealTime])
+  @@unique([userId, mealTime, appliedDate])
 }
 
 model Meal {
-  id                 Int      @id @default(autoincrement())
-  mealName           String
-  caloriesPerServing Int
-  mealType           mealType @default(food)
-  imgURL             String?
+  id       Int      @id @default(autoincrement())
+  mealName String   @unique
+  mealType mealType @default(food)
+  imgURL   String?
 
-  mealIngredients MealIngredient[]
-  chosenMeals     ChosenMeal[]
+  createdBy String?
+  user      User?   @relation(fields: [createdBy], references: [id])
+
+  ingredients MealIngredient[]
+  chosenMeals ChosenMeal[]
 }
 
 model MealIngredient {
+  id              Int            @id @default(autoincrement())
   ingredientValue Float
+  ingredientUnit  ingredientUnit @default(g)
 
   ingredientUnitCovert IngredientUnitCovert @relation(fields: [ingredientUnit], references: [ingredientUnit])
-  ingredientUnit       ingredientUnit       @default(g)
   meal                 Meal                 @relation(fields: [mealId], references: [id])
   mealId               Int
   ingredient           Ingredient           @relation(fields: [ingredientId], references: [id])
   ingredientId         Int
 
-  @@id([mealId, ingredientId])
+  @@unique([mealId, ingredientId])
 }
 
 model IngredientUnitCovert {
@@ -95,16 +92,19 @@ model IngredientUnitCovert {
 }
 
 model Ingredient {
-  id                       Int            @id @default(autoincrement())
-  ingredientName           String
-  ingredientCaloriesOn100g Int
-  ingredientType           ingredientType @default(meat)
+  id             Int             @id @default(autoincrement())
+  ingredientName String
+  ingredientType ingredientType?
 
-  ingredientNutrients IngredientNutrient[]
-  mealIngredients     MealIngredient[]
+  createdBy String?
+  user      User?   @relation(fields: [createdBy], references: [id])
+
+  nutrients IngredientNutrient[]
+  meals     MealIngredient[]
 }
 
 model IngredientNutrient {
+  id                  Int   @id @default(autoincrement())
   nutrientValueOn100g Float
 
   ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
@@ -112,16 +112,16 @@ model IngredientNutrient {
   nutrient     Nutrient   @relation(fields: [nutrientId], references: [id])
   nutrientId   Int
 
-  @@id([ingredientId, nutrientId])
+  @@unique([ingredientId, nutrientId])
 }
 
 model Nutrient {
   id           Int          @id @default(autoincrement())
-  nutrientName String
+  nutrientName String       @unique
   nutrientType nutrientType @default(macro)
   nutrientUnit nutrientUnit @default(g)
 
-  ingredientNutrients IngredientNutrient[]
+  ingredients IngredientNutrient[]
 }
 
 enum nutrientType {
@@ -130,6 +130,7 @@ enum nutrientType {
 }
 
 enum nutrientUnit {
+  kCal
   g
   mg
   mcg
@@ -146,6 +147,7 @@ enum mealType {
   food
   fruit
   drink
+  snack
 }
 
 enum gender {
@@ -170,4 +172,20 @@ enum ingredientUnit {
 enum ingredientType {
   meat
   vegetable
+  milk
+  nut
+  fruit
+  oil
+  seafood
+  spice
+  candy
+  beverage
+  bread
+  other
+}
+
+enum activityLevel {
+  low
+  medium
+  high
 }
