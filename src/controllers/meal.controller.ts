@@ -4,7 +4,7 @@ import {
   findAllMeals,
   findMealByName,
   createMeal,
-  findMealById,
+  findMealSpecificById,
 } from '../services/meal.service';
 
 const getAllMeals = async (req: Request, res: Response) => {
@@ -21,7 +21,7 @@ const getAllMeals = async (req: Request, res: Response) => {
 const getMealById = async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const meal = await findMealById(parseInt(id));
+  const meal = await findMealSpecificById(parseInt(id));
 
   res.status(StatusCodes.OK).json({ meal });
 };

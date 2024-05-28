@@ -1,14 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { findAllIngredientsRepository } from '../repositories/ingredient.repository';
 
 const findAllIngredients = async () => {
-  return await prisma.ingredient.findMany({
-    select: {
-      id: true,
-      ingredientName: true,
-      ingredientType: true,
-    },
-  });
+  return await findAllIngredientsRepository();
 };
 
 export { findAllIngredients };

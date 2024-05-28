@@ -1,54 +1,30 @@
-import { PrismaClient } from '@prisma/client';
 import {
   MealIngredient,
   MealIngredientRequest,
 } from '../types/mealIngredient.type';
-
-const prisma = new PrismaClient();
+import { flattenMealIngredients } from '../utils/flattenResponse.util';
+import {
+  findAllMealsRepository,
+  findMealSpecificByIdRepository,
+  findMealByNameRepository,
+  createMealRepository,
+} from '../repositories/meal.repository';
 
 const findAllMeals = async (page: number | null, limit: number | null) => {
   limit = limit ? limit : 12;
-  page = page ? (page - 1) * limit : 1;
+  page = page ? (page - 1) * limit : 0;
 
-  const meals = await prisma.meal.findMany({
-    skip: page,
-    take: limit,
-  });
-  return meals;
+  return await findAllMealsRepository(page, limit);
 };
 
-const findMealById = async (id: number) => {
-  const meals = await prisma.meal.findFirst({
-    where: {
-      id,
-    },
-    include: {
-      ingredients: {
-        select: {
-          ingredientValue: true,
-          ingredientUnit: true,
-          ingredient: {
-            select: {
-              ingredientName: true,
-              ingredientType: true,
-            },
-          },
-        },
-      },
-    },
-  });
-  return meals;
+const findMealSpecificById = async (id: number) => {
+  const meal = await findMealSpecificByIdRepository(id);
+
+  return { ...meal, ingredients: flattenMealIngredients(meal?.ingredients) };
 };
 
 const findMealByName = async (mealName: string) => {
-  const meals = await prisma.meal.findMany({
-    where: {
-      mealName: {
-        contains: mealName,
-      },
-    },
-  });
-  return meals;
+  return await findMealByNameRepository(mealName);
 };
 
 const createMeal = async (
@@ -63,14 +39,7 @@ const createMeal = async (
     })
   );
 
-  await prisma.meal.create({
-    data: {
-      mealName,
-      ingredients: {
-        create: handledIngredients,
-      },
-    },
-  });
+  await createMealRepository(mealName, handledIngredients);
 };
 
-export { findAllMeals, findMealByName, createMeal, findMealById };
+export { findAllMeals, findMealByName, createMeal, findMealSpecificById };

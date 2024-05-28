@@ -1,4 +1,4 @@
-import { ingredientUnit } from '@prisma/client';
+import { ingredientType, ingredientUnit } from '@prisma/client';
 
 export interface MealIngredientRequest {
   id: number;
@@ -10,4 +10,13 @@ export interface MealIngredient {
   ingredientId: number;
   ingredientValue: number;
   ingredientUnit: ingredientUnit;
+}
+
+export interface ResponseIngredient {
+  ingredientValue: number;
+  ingredientUnit: ingredientUnit;
+  ingredient: {
+    ingredientName: string;
+    ingredientType: ingredientType | null;
+  };
 }
