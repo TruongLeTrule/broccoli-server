@@ -3,12 +3,19 @@ import { MealIngredientRequest } from '../types/meal.type';
 
 const prisma = new PrismaClient();
 
-export const findAllMealsRepository = async (page: number, limit: number) => {
-  const meals = await prisma.meal.findMany({
+export const findAllMealsRepository = async (
+  page: number | undefined,
+  limit: number | undefined
+) => {
+  if (!page) return await prisma.meal.findMany();
+
+  limit = limit ? limit : 12;
+  page = (page - 1) * limit;
+
+  return await prisma.meal.findMany({
     skip: page,
     take: limit,
   });
-  return meals;
 };
 
 export const findMealSpecificByIdRepository = async (mealId: number) => {

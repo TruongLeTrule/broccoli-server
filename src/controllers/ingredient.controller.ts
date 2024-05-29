@@ -7,7 +7,7 @@ import {
 import { StatusCodes } from 'http-status-codes';
 import { Request, Response } from 'express';
 
-export const getAllIngredients = async (req: Request, res: Response) => {
+export const getAllIngredients = async (_: any, res: Response) => {
   const ingredients = await findAllIngredients();
   res.status(StatusCodes.OK).json({ ingredients });
 };

@@ -8,11 +8,9 @@ import {
 import { flattenIngredients } from '../utils/flattenPrismaResponse.util';
 
 export const findAllMeals = async (
-  page: number | null,
-  limit: number | null
+  page: number | undefined,
+  limit: number | undefined
 ) => {
-  limit = limit ? limit : 12;
-  page = page ? (page - 1) * limit : 0;
   return await findAllMealsRepository(page, limit);
 };
 

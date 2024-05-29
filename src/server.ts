@@ -14,6 +14,7 @@ import helmet from 'helmet';
 import authRoute from './routes/auth.route';
 import mealRoute from './routes/meal.route';
 import ingredientRoute from './routes/ingredient.route';
+import nutrientRoute from './routes/nutrient.route';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ app.use(cookieParser());
 app.use(`${BASE_URL}/auth`, authRoute);
 app.use(`${BASE_URL}/meals`, mealRoute);
 app.use(`${BASE_URL}/ingredients`, ingredientRoute);
+app.use(`${BASE_URL}/nutrients`, nutrientRoute);
 
 // Error handlers
 app.use('*', (req, res) => {
