@@ -5,7 +5,7 @@ import {
 import { RegisterUser } from '../types/user.type';
 import { hashPassword } from '../utils/password.util';
 
-const createUser = async (registerUser: RegisterUser) => {
+export const createUser = async (registerUser: RegisterUser) => {
   const { username, password, fullName } = registerUser;
 
   const hashedPassword = await hashPassword(password);
@@ -13,8 +13,6 @@ const createUser = async (registerUser: RegisterUser) => {
   await createUserRepository(username, hashedPassword, fullName);
 };
 
-const findOneUser = async (username: string) => {
+export const findOneUser = async (username: string) => {
   return await findOneUserRepository(username);
 };
-
-export { createUser, findOneUser };

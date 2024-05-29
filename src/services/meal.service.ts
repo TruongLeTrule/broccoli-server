@@ -1,45 +1,43 @@
 import {
-  MealIngredient,
-  MealIngredientRequest,
-} from '../types/mealIngredient.type';
-import { flattenMealIngredients } from '../utils/flattenResponse.util';
+  HandledCreateMealRequest,
+  CreateMealRequest,
+} from '../types/meal.type';
 import {
   findAllMealsRepository,
   findMealSpecificByIdRepository,
   findMealByNameRepository,
   createMealRepository,
 } from '../repositories/meal.repository';
+import { flattenMealIngredients } from '../utils/flattenPrismaResponse.util';
 
-const findAllMeals = async (page: number | null, limit: number | null) => {
+export const findAllMeals = async (
+  page: number | null,
+  limit: number | null
+) => {
   limit = limit ? limit : 12;
   page = page ? (page - 1) * limit : 0;
-
   return await findAllMealsRepository(page, limit);
 };
 
-const findMealSpecificById = async (id: number) => {
+export const findMealSpecificById = async (id: number) => {
   const meal = await findMealSpecificByIdRepository(id);
-
   return { ...meal, ingredients: flattenMealIngredients(meal?.ingredients) };
 };
 
-const findMealByName = async (mealName: string) => {
+export const findMealByName = async (mealName: string) => {
   return await findMealByNameRepository(mealName);
 };
 
-const createMeal = async (
+export const createMeal = async (
   mealName: string,
-  ingredients: Array<MealIngredientRequest>
+  ingredients: Array<CreateMealRequest>
 ) => {
-  const handledIngredients: Array<MealIngredient> = ingredients.map(
+  const handledIngredients: Array<HandledCreateMealRequest> = ingredients.map(
     ({ id, ingredientValue, ingredientUnit }) => ({
       ingredientValue,
       ingredientUnit,
       ingredientId: id,
     })
   );
-
   await createMealRepository(mealName, handledIngredients);
 };
-
-export { findAllMeals, findMealByName, createMeal, findMealSpecificById };

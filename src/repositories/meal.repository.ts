@@ -1,8 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import {
-  MealIngredientRequest,
-  MealIngredient,
-} from '../types/mealIngredient.type';
+import { HandledCreateMealRequest } from '../types/meal.type';
 
 const prisma = new PrismaClient();
 
@@ -50,7 +47,7 @@ export const findMealByNameRepository = async (mealName: string) => {
 
 export const createMealRepository = async (
   mealName: string,
-  ingredients: Array<MealIngredient>
+  ingredients: Array<HandledCreateMealRequest>
 ) => {
   await prisma.meal.create({
     data: {

@@ -1,18 +1,18 @@
 import { ingredientType, ingredientUnit } from '@prisma/client';
 
-export interface MealIngredientRequest {
+export interface CreateMealRequest {
   id: number;
   ingredientValue: number;
   ingredientUnit: ingredientUnit;
 }
 
-export interface MealIngredient {
+export interface HandledCreateMealRequest {
   ingredientId: number;
   ingredientValue: number;
   ingredientUnit: ingredientUnit;
 }
 
-export interface ResponseIngredient {
+export interface MealPrismaRespond {
   ingredientValue: number;
   ingredientUnit: ingredientUnit;
   ingredient: {
