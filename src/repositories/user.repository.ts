@@ -15,8 +15,8 @@ export const createUserRepository = async (
   });
 };
 
-export const findOneUserRepository = async (username: string) => {
-  const user = await prisma.user.findFirst({
+export const findUniqueUserRepository = async (username: string) => {
+  const user = await prisma.user.findUnique({
     where: {
       username,
     },

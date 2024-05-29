@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { HandledCreateMealRequest } from '../types/meal.type';
+import { MealIngredientRequest } from '../types/meal.type';
 
 const prisma = new PrismaClient();
 
@@ -11,10 +11,10 @@ export const findAllMealsRepository = async (page: number, limit: number) => {
   return meals;
 };
 
-export const findMealSpecificByIdRepository = async (id: number) => {
+export const findMealSpecificByIdRepository = async (mealId: number) => {
   const meal = await prisma.meal.findFirst({
     where: {
-      id,
+      mealId,
     },
     include: {
       ingredients: {
@@ -47,7 +47,7 @@ export const findMealByNameRepository = async (mealName: string) => {
 
 export const createMealRepository = async (
   mealName: string,
-  ingredients: Array<HandledCreateMealRequest>
+  ingredients: Array<MealIngredientRequest>
 ) => {
   await prisma.meal.create({
     data: {

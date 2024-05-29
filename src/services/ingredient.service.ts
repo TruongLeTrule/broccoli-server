@@ -5,11 +5,8 @@ import {
   findIngredientSpecificByIdRepository,
   createIngredientRepository,
 } from '../repositories/ingredient.repository';
-import {
-  CreateIngredientRequest,
-  HandledCreateIngredientRequest,
-} from '../types/ingredient.type';
-// import { flattenIngredientNutrient } from '../utils/flattenResponse.util';
+import { IngredientNutrientRequest } from '../types/ingredient.type';
+import { flattenNutrients } from '../utils/flattenPrismaResponse.util';
 
 export const findAllIngredients = async () => {
   return await findAllIngredientsRepository();
@@ -21,23 +18,16 @@ export const findIngredientByName = async (ingredientName: string) => {
 
 export const findIngredientSpecificById = async (id: number) => {
   const ingredient = await findIngredientSpecificByIdRepository(id);
-  return ingredient;
+
+  const flatNutrients = flattenNutrients(ingredient?.nutrients);
+
+  return { ...ingredient, nutrients: flatNutrients };
 };
 
 export const createIngredient = async (
   ingredientName: string,
   ingredientType: ingredientType,
-  nutrients: Array<CreateIngredientRequest>
+  nutrients: Array<IngredientNutrientRequest>
 ) => {
-  const handledNutrients: Array<HandledCreateIngredientRequest> = nutrients.map(
-    ({ id, nutrientValueOn100g }) => ({
-      nutrientId: id,
-      nutrientValueOn100g,
-    })
-  );
-  await createIngredientRepository(
-    ingredientName,
-    ingredientType,
-    handledNutrients
-  );
+  await createIngredientRepository(ingredientName, ingredientType, nutrients);
 };

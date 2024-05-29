@@ -1,5 +1,9 @@
 import jwt, { Secret } from 'jsonwebtoken';
-import JwtPayload from '../types/jwtPayload.type';
+
+interface JwtPayload {
+  exp: number;
+  userId: string;
+}
 
 const createToken = (payload: Object) => {
   const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as string, {

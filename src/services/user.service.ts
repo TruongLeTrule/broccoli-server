@@ -1,18 +1,34 @@
 import {
   createUserRepository,
-  findOneUserRepository,
+  findUniqueUserRepository,
 } from '../repositories/user.repository';
-import { RegisterUser } from '../types/user.type';
+import { createToken } from '../utils/token.util';
 import { hashPassword } from '../utils/password.util';
+import { comparePassword } from '../utils/password.util';
+import { BadRequestError, NotFoundError } from '../utils/customErrors';
 
-export const createUser = async (registerUser: RegisterUser) => {
-  const { username, password, fullName } = registerUser;
+export const registerService = async (
+  username: string,
+  password: string,
+  fullName: string
+) => {
+  const foundUser = await findUniqueUserRepository(username);
+  if (foundUser) throw new BadRequestError('account already exists');
 
   const hashedPassword = await hashPassword(password);
 
   await createUserRepository(username, hashedPassword, fullName);
 };
 
-export const findOneUser = async (username: string) => {
-  return await findOneUserRepository(username);
+export const loginService = async (username: string, password: string) => {
+  const foundUser = await findUniqueUserRepository(username);
+  if (!foundUser) throw new NotFoundError('wrong username or password');
+
+  const isPasswordValid = await comparePassword(
+    password,
+    foundUser.hashedPassword
+  );
+  if (!isPasswordValid) throw new NotFoundError('wrong username or password');
+
+  return createToken({ userId: foundUser.userId });
 };

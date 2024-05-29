@@ -1,11 +1,12 @@
 import { PrismaClient, ingredientType } from '@prisma/client';
-import { HandledCreateIngredientRequest } from '../types/ingredient.type';
+import { IngredientNutrientRequest } from '../types/ingredient.type';
+
 const prisma = new PrismaClient();
 
 export const findAllIngredientsRepository = async () => {
   return await prisma.ingredient.findMany({
     select: {
-      id: true,
+      ingredientId: true,
       ingredientName: true,
       ingredientType: true,
     },
@@ -25,10 +26,12 @@ export const findIngredientByNameRepository = async (
   return ingredients;
 };
 
-export const findIngredientSpecificByIdRepository = async (id: number) => {
+export const findIngredientSpecificByIdRepository = async (
+  ingredientId: number
+) => {
   const ingredient = await prisma.ingredient.findFirst({
     where: {
-      id,
+      ingredientId,
     },
     include: {
       nutrients: {
@@ -45,7 +48,7 @@ export const findIngredientSpecificByIdRepository = async (id: number) => {
 export const createIngredientRepository = async (
   ingredientName: string,
   ingredientType: ingredientType,
-  ingredients: Array<HandledCreateIngredientRequest>
+  ingredients: Array<IngredientNutrientRequest>
 ) => {
   await prisma.ingredient.create({
     data: {

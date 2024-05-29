@@ -1,20 +1,16 @@
-import { ingredientType, nutrientUnit } from '@prisma/client';
+import { nutrientType, nutrientUnit } from '@prisma/client';
 
-export interface CreateIngredientRequest {
-  nutrientValueOn100g: number;
-  id: number;
-}
-
-export interface HandledCreateIngredientRequest {
+export interface IngredientNutrientRequest {
   nutrientValueOn100g: number;
   nutrientId: number;
 }
 
-export interface CreateIngredientPrisma {
-  ingredientName: string;
-  ingredientType: ingredientType;
+export interface NutrientPrisma {
+  nutrientValueOn100g: number;
   nutrient: {
+    nutrientId: number;
     nutrientName: string;
-    nutrientUnit: ingredientType | null;
+    nutrientType: nutrientType;
+    nutrientUnit: nutrientUnit | null;
   };
 }

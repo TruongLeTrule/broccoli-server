@@ -1,7 +1,8 @@
-import { MealPrismaRespond } from '../types/meal.type';
+import { IngredientPrisma } from '../types/meal.type';
+import { NutrientPrisma } from '../types/ingredient.type';
 
-export const flattenMealIngredients = (
-  ingredients: Array<MealPrismaRespond> | undefined
+export const flattenIngredients = (
+  ingredients: Array<IngredientPrisma> | undefined
 ) => {
   return ingredients?.map(
     ({ ingredientValue, ingredientUnit, ingredient }) => ({
@@ -13,15 +14,13 @@ export const flattenMealIngredients = (
   );
 };
 
-// export const flattenIngredientNutrients = (
-//   ingredients: Array<IngredientNutrientPrisma> | undefined
-// ) => {
-//   return ingredients?.map(
-//     ({ ingredientValue, ingredientUnit, ingredient }) => ({
-//       ingredientValue,
-//       ingredientUnit,
-//       ingredientName: ingredient.ingredientName,
-//       ingredientType: ingredient.ingredientType,
-//     })
-//   );
-// };
+export const flattenNutrients = (
+  nutrients: Array<NutrientPrisma> | undefined
+) => {
+  return nutrients?.map(({ nutrient, nutrientValueOn100g }) => ({
+    nutrientValueOn100g,
+    nutrientName: nutrient.nutrientName,
+    nutrientType: nutrient.nutrientType,
+    nutrientUnit: nutrient.nutrientUnit,
+  }));
+};

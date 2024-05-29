@@ -1,14 +1,11 @@
-import {
-  HandledCreateMealRequest,
-  CreateMealRequest,
-} from '../types/meal.type';
+import { MealIngredientRequest } from '../types/meal.type';
 import {
   findAllMealsRepository,
   findMealSpecificByIdRepository,
   findMealByNameRepository,
   createMealRepository,
 } from '../repositories/meal.repository';
-import { flattenMealIngredients } from '../utils/flattenPrismaResponse.util';
+import { flattenIngredients } from '../utils/flattenPrismaResponse.util';
 
 export const findAllMeals = async (
   page: number | null,
@@ -21,7 +18,10 @@ export const findAllMeals = async (
 
 export const findMealSpecificById = async (id: number) => {
   const meal = await findMealSpecificByIdRepository(id);
-  return { ...meal, ingredients: flattenMealIngredients(meal?.ingredients) };
+
+  const flatMealIngredients = flattenIngredients(meal?.ingredients);
+
+  return { ...meal, ingredients: flatMealIngredients };
 };
 
 export const findMealByName = async (mealName: string) => {
@@ -30,14 +30,7 @@ export const findMealByName = async (mealName: string) => {
 
 export const createMeal = async (
   mealName: string,
-  ingredients: Array<CreateMealRequest>
+  ingredients: Array<MealIngredientRequest>
 ) => {
-  const handledIngredients: Array<HandledCreateMealRequest> = ingredients.map(
-    ({ id, ingredientValue, ingredientUnit }) => ({
-      ingredientValue,
-      ingredientUnit,
-      ingredientId: id,
-    })
-  );
-  await createMealRepository(mealName, handledIngredients);
+  await createMealRepository(mealName, ingredients);
 };

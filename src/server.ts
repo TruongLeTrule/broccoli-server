@@ -18,6 +18,8 @@ import ingredientRoute from './routes/ingredient.route';
 dotenv.config();
 
 const app = express();
+const BASE_URL = '/api/v1';
+const port = process.env.PORT || 3000;
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -30,9 +32,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-app.use('/api/v1/auth', authRoute);
-app.use('/api/v1/meals', mealRoute);
-app.use('/api/v1/ingredients', ingredientRoute);
+app.use(`${BASE_URL}/auth`, authRoute);
+app.use(`${BASE_URL}/meals`, mealRoute);
+app.use(`${BASE_URL}/ingredients`, ingredientRoute);
 
 // Error handlers
 app.use('*', (req, res) => {
@@ -40,7 +42,6 @@ app.use('*', (req, res) => {
 });
 app.use(errorHandlerMiddleware);
 
-const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`listening on port ${port}...`);
 });

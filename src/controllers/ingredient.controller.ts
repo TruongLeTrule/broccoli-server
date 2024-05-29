@@ -22,12 +22,16 @@ export const getIngredientByName = async (req: Request, res: Response) => {
 
 export const getIngredientById = async (req: Request, res: Response) => {
   const { id } = req.params;
+
   const ingredient = await findIngredientSpecificById(parseInt(id));
+
   res.status(StatusCodes.OK).json({ ingredient });
 };
 
 export const postIngredient = async (req: Request, res: Response) => {
   const { ingredientName, ingredientType, nutrients } = req.body;
+
   await createIngredient(ingredientName, ingredientType, nutrients);
+
   res.status(StatusCodes.OK).json({ msg: 'Ingredient created' });
 };
