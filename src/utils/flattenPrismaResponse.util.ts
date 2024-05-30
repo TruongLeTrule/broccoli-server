@@ -18,8 +18,6 @@ export const flattenNutrients = (
 ) => {
   return nutrients?.map(({ nutrient, nutrientValueOn100g }) => ({
     nutrientValueOn100g,
-    nutrientName: nutrient.nutrientName,
-    nutrientType: nutrient.nutrientType,
-    nutrientUnit: nutrient.nutrientUnit,
+    ...nutrient,
   }));
 };

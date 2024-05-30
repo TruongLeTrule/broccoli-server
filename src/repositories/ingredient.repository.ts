@@ -38,6 +38,7 @@ export const findIngredientSpecificByIdRepository = async (
         select: {
           nutrientValueOn100g: true,
           nutrient: true,
+          nutrientId: true,
         },
       },
     },
