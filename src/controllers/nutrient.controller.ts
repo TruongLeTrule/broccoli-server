@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { findAllIngredients } from '../services/nutrient.service';
+import { findAllIngredientsService } from '../services/nutrient.service';
 
-export const getAllNutrients = async (_: any, res: Response) => {
-  const nutrients = await findAllIngredients();
+export const getAllNutrientsController = async (_: any, res: Response) => {
+  const nutrients = await findAllIngredientsService();
 
   res.status(StatusCodes.OK).json({ nutrients });
 };

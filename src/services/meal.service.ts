@@ -1,20 +1,21 @@
-import { MealIngredientRequest } from '../types/meal.type';
+import { CreateOrUpdateMealDto } from '../types/meal.type';
 import {
   findAllMealsRepository,
   findMealSpecificByIdRepository,
   findMealByNameRepository,
-  createMealRepository,
+  createOrUpdateMealRepository,
+  deleteMealRepository,
 } from '../repositories/meal.repository';
 import { flattenIngredients } from '../utils/flattenPrismaResponse.util';
 
-export const findAllMeals = async (
+export const findAllMealsService = async (
   page: number | undefined,
   limit: number | undefined
 ) => {
   return await findAllMealsRepository(page, limit);
 };
 
-export const findMealSpecificById = async (id: number) => {
+export const findMealSpecificByIdService = async (id: number) => {
   const meal = await findMealSpecificByIdRepository(id);
 
   const flatMealIngredients = flattenIngredients(meal?.ingredients);
@@ -22,13 +23,23 @@ export const findMealSpecificById = async (id: number) => {
   return { ...meal, ingredients: flatMealIngredients };
 };
 
-export const findMealByName = async (mealName: string) => {
+export const findMealByNameService = async (mealName: string) => {
   return await findMealByNameRepository(mealName);
 };
 
-export const createMeal = async (
-  mealName: string,
-  ingredients: Array<MealIngredientRequest>
+export const createMealService = async (
+  createMealRequest: CreateOrUpdateMealDto
 ) => {
-  await createMealRepository(mealName, ingredients);
+  await createOrUpdateMealRepository(createMealRequest);
+};
+
+export const updateMealService = async (
+  id: number,
+  newMeal: CreateOrUpdateMealDto
+) => {
+  await createOrUpdateMealRepository(newMeal, id);
+};
+
+export const deleteMealService = async (id: number) => {
+  await deleteMealRepository(id);
 };

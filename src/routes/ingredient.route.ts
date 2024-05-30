@@ -1,15 +1,18 @@
 import express from 'express';
 import {
-  getAllIngredients,
-  getIngredientByName,
-  getIngredientById,
-  postIngredient,
+  getAllIngredientsController,
+  getIngredientByNameController,
+  getIngredientByIdController,
+  postIngredientController,
 } from '../controllers/ingredient.controller';
 
 const router = express.Router();
 
-router.route('/').get(getAllIngredients).post(postIngredient);
-router.route('/:id').get(getIngredientById);
-router.route('/search').post(getIngredientByName);
+router
+  .route('/')
+  .get(getAllIngredientsController)
+  .post(postIngredientController);
+router.route('/:id').get(getIngredientByIdController);
+router.route('/search').post(getIngredientByNameController);
 
 export default router;

@@ -1,37 +1,43 @@
 import {
-  findAllIngredients,
-  findIngredientByName,
-  findIngredientSpecificById,
-  createIngredient,
+  findAllIngredientsService,
+  findIngredientByNameService,
+  findIngredientSpecificByIdService,
+  createIngredientService,
 } from '../services/ingredient.service';
 import { StatusCodes } from 'http-status-codes';
 import { Request, Response } from 'express';
 
-export const getAllIngredients = async (_: any, res: Response) => {
-  const ingredients = await findAllIngredients();
+export const getAllIngredientsController = async (_: any, res: Response) => {
+  const ingredients = await findAllIngredientsService();
   res.status(StatusCodes.OK).json({ ingredients });
 };
 
-export const getIngredientByName = async (req: Request, res: Response) => {
+export const getIngredientByNameController = async (
+  req: Request,
+  res: Response
+) => {
   const { ingredientName } = req.body;
 
-  const ingredients = await findIngredientByName(ingredientName);
+  const ingredients = await findIngredientByNameService(ingredientName);
 
   res.status(StatusCodes.OK).json({ ingredients });
 };
 
-export const getIngredientById = async (req: Request, res: Response) => {
+export const getIngredientByIdController = async (
+  req: Request,
+  res: Response
+) => {
   const { id } = req.params;
 
-  const ingredient = await findIngredientSpecificById(parseInt(id));
+  const ingredient = await findIngredientSpecificByIdService(parseInt(id));
 
   res.status(StatusCodes.OK).json({ ingredient });
 };
 
-export const postIngredient = async (req: Request, res: Response) => {
+export const postIngredientController = async (req: Request, res: Response) => {
   const { ingredientName, ingredientType, nutrients } = req.body;
 
-  await createIngredient(ingredientName, ingredientType, nutrients);
+  await createIngredientService(ingredientName, ingredientType, nutrients);
 
   res.status(StatusCodes.OK).json({ msg: 'Ingredient created' });
 };

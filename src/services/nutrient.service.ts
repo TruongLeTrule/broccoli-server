@@ -1,5 +1,5 @@
 import { findAllNutrientsRepository } from '../repositories/nutrient.repository';
 
-export const findAllIngredients = async () => {
+export const findAllIngredientsService = async () => {
   return await findAllNutrientsRepository();
 };

@@ -8,15 +8,15 @@ import {
 import { IngredientNutrientRequest } from '../types/ingredient.type';
 import { flattenNutrients } from '../utils/flattenPrismaResponse.util';
 
-export const findAllIngredients = async () => {
+export const findAllIngredientsService = async () => {
   return await findAllIngredientsRepository();
 };
 
-export const findIngredientByName = async (ingredientName: string) => {
+export const findIngredientByNameService = async (ingredientName: string) => {
   return await findIngredientByNameRepository(ingredientName);
 };
 
-export const findIngredientSpecificById = async (id: number) => {
+export const findIngredientSpecificByIdService = async (id: number) => {
   const ingredient = await findIngredientSpecificByIdRepository(id);
 
   const flatNutrients = flattenNutrients(ingredient?.nutrients);
@@ -24,7 +24,7 @@ export const findIngredientSpecificById = async (id: number) => {
   return { ...ingredient, nutrients: flatNutrients };
 };
 
-export const createIngredient = async (
+export const createIngredientService = async (
   ingredientName: string,
   ingredientType: ingredientType,
   nutrients: Array<IngredientNutrientRequest>

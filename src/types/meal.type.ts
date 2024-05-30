@@ -1,9 +1,13 @@
-import { ingredientType, ingredientUnit } from '@prisma/client';
+import { ingredientType, ingredientUnit, mealType } from '@prisma/client';
 
-export interface MealIngredientRequest {
-  ingredientId: number;
-  ingredientValue: number;
-  ingredientUnit: ingredientUnit;
+export interface CreateOrUpdateMealDto {
+  mealName: string;
+  mealType: mealType | undefined;
+  ingredients: Array<{
+    ingredientId: number;
+    ingredientValue: number;
+    ingredientUnit: ingredientUnit;
+  }>;
 }
 
 export interface IngredientPrisma {

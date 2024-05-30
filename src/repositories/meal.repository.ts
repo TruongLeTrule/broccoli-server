@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { MealIngredientRequest } from '../types/meal.type';
+import { CreateOrUpdateMealDto } from '../types/meal.type';
 
 const prisma = new PrismaClient();
 
@@ -52,16 +52,42 @@ export const findMealByNameRepository = async (mealName: string) => {
   return meals;
 };
 
-export const createMealRepository = async (
-  mealName: string,
-  ingredients: Array<MealIngredientRequest>
+export const createOrUpdateMealRepository = async (
+  createMealRequest: CreateOrUpdateMealDto,
+  id?: number
 ) => {
-  await prisma.meal.create({
+  const { mealName, mealType, ingredients } = createMealRequest;
+
+  if (id)
+    return await prisma.meal.update({
+      where: {
+        mealId: id,
+      },
+      data: {
+        mealName,
+        mealType,
+        ingredients: {
+          deleteMany: {},
+          create: ingredients,
+        },
+      },
+    });
+
+  return await prisma.meal.create({
     data: {
       mealName,
+      mealType,
       ingredients: {
         create: ingredients,
       },
+    },
+  });
+};
+
+export const deleteMealRepository = async (id: number) => {
+  await prisma.meal.delete({
+    where: {
+      mealId: id,
     },
   });
 };
