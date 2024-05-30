@@ -85,7 +85,7 @@ export const createOrUpdateMealRepository = async (
 };
 
 export const deleteMealRepository = async (id: number) => {
-  await prisma.meal.delete({
+  return await prisma.meal.delete({
     where: {
       mealId: id,
     },

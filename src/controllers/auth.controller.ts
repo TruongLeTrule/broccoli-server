@@ -26,9 +26,9 @@ const registerController = async (req: Request, res: Response) => {
   if (!username || !password || !fullName)
     throw new BadRequestError('Please fill all required fields');
 
-  await registerService(username, password, fullName);
+  const user = await registerService(username, password, fullName);
 
-  res.status(StatusCodes.CREATED).json({ msg: 'register successful' });
+  res.status(StatusCodes.CREATED).json({ msg: 'register successful', user });
 };
 
 export { loginController, registerController };

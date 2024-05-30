@@ -10,50 +10,40 @@ import {
 } from '../services/meal.service';
 
 export const getAllMealsController = async (req: Request, res: Response) => {
-  const { page, limit } = req.query;
-
   const meals = await findAllMealsService(
-    parseInt(page as string),
-    parseInt(limit as string)
+    parseInt(req.query.page as string),
+    parseInt(req.query.limit as string)
   );
 
   res.status(StatusCodes.OK).json({ meals });
 };
 
 export const getMealByIdController = async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  const meal = await findMealSpecificByIdService(parseInt(id));
+  const meal = await findMealSpecificByIdService(parseInt(req.params.id));
 
   res.status(StatusCodes.OK).json({ meal });
 };
 
 export const getMealByNameController = async (req: Request, res: Response) => {
-  const { mealName } = req.body;
-
-  const meals = await findMealByNameService(mealName);
+  const meals = await findMealByNameService(req.body.mealName);
 
   res.status(StatusCodes.OK).json({ meals });
 };
 
 export const postMealController = async (req: Request, res: Response) => {
-  await createMealService(req.body);
+  const meal = await createMealService(req.body);
 
-  res.status(StatusCodes.CREATED).json({ msg: 'Meal created' });
+  res.status(StatusCodes.CREATED).json({ msg: 'Meal created', meal });
 };
 
 export const deleteMealController = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const meal = await deleteMealService(parseInt(req.params.id));
 
-  await deleteMealService(parseInt(id));
-
-  res.status(StatusCodes.OK).json({ msg: 'Meal deleted' });
+  res.status(StatusCodes.OK).json({ msg: 'Meal deleted', meal });
 };
 
 export const updateMealController = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const meal = await updateMealService(parseInt(req.params.id), req.body);
 
-  await updateMealService(parseInt(id), req.body);
-
-  res.status(StatusCodes.OK).json({ msg: 'Meal updated' });
+  res.status(StatusCodes.OK).json({ msg: 'Meal updated', meal });
 };

@@ -30,16 +30,16 @@ export const findMealByNameService = async (mealName: string) => {
 export const createMealService = async (
   createMealRequest: CreateOrUpdateMealDto
 ) => {
-  await createOrUpdateMealRepository(createMealRequest);
+  return await createOrUpdateMealRepository(createMealRequest);
 };
 
 export const updateMealService = async (
   id: number,
   newMeal: CreateOrUpdateMealDto
 ) => {
-  await createOrUpdateMealRepository(newMeal, id);
+  return await createOrUpdateMealRepository(newMeal, id);
 };
 
 export const deleteMealService = async (id: number) => {
-  await deleteMealRepository(id);
+  return await deleteMealRepository(id);
 };

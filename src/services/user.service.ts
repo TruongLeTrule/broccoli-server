@@ -17,7 +17,7 @@ export const registerService = async (
 
   const hashedPassword = await hashPassword(password);
 
-  await createUserRepository(username, hashedPassword, fullName);
+  return await createUserRepository(username, hashedPassword, fullName);
 };
 
 export const loginService = async (username: string, password: string) => {
@@ -30,5 +30,9 @@ export const loginService = async (username: string, password: string) => {
   );
   if (!isPasswordValid) throw new NotFoundError('wrong username or password');
 
-  return createToken({ userId: foundUser.userId });
+  return createToken({
+    userId: foundUser.userId,
+    username: foundUser.username,
+    imgUrl: foundUser.imgUrl,
+  });
 };

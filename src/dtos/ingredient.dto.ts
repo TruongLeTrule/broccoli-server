@@ -1,4 +1,10 @@
+import { ingredientType } from '@prisma/client';
+
 export interface CreateOrUpdateIngredientDto {
-  nutrientValueOn100g: number;
-  nutrientId: number;
+  ingredientName: string;
+  ingredientType: ingredientType;
+  nutrients: Array<{
+    nutrientValueOn100g: number;
+    nutrientId: number;
+  }>;
 }

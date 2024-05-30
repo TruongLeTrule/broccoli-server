@@ -1,9 +1,9 @@
-import { ingredientType } from '@prisma/client';
 import {
   findAllIngredientsRepository,
   findIngredientByNameRepository,
   findIngredientSpecificByIdRepository,
-  createIngredientRepository,
+  createOrUpdateIngredientRepository,
+  deleteIngredientRepository,
 } from '../repositories/ingredient.repository';
 import { CreateOrUpdateIngredientDto } from '../dtos/ingredient.dto';
 import { flattenNutrients } from '../utils/flattenPrismaResponse.util';
@@ -25,9 +25,18 @@ export const findIngredientSpecificByIdService = async (id: number) => {
 };
 
 export const createIngredientService = async (
-  ingredientName: string,
-  ingredientType: ingredientType,
-  nutrients: Array<CreateOrUpdateIngredientDto>
+  createIngredientRequest: CreateOrUpdateIngredientDto
 ) => {
-  await createIngredientRepository(ingredientName, ingredientType, nutrients);
+  return await createOrUpdateIngredientRepository(createIngredientRequest);
+};
+
+export const updateIngredientService = async (
+  createIngredientRequest: CreateOrUpdateIngredientDto,
+  id: number
+) => {
+  return await createOrUpdateIngredientRepository(createIngredientRequest, id);
+};
+
+export const deleteIngredientService = async (id: number) => {
+  return await deleteIngredientRepository(id);
 };

@@ -6,7 +6,7 @@ export const createUserRepository = async (
   hashedPassword: string,
   fullName: string
 ) => {
-  await prisma.user.create({
+  return await prisma.user.create({
     data: {
       username,
       hashedPassword,
