@@ -1,5 +1,4 @@
-import { IngredientPrisma } from '../types/meal.type';
-import { NutrientPrisma } from '../types/ingredient.type';
+import { IngredientPrisma, NutrientPrisma } from '../types/prismaResponse.type';
 
 export const flattenIngredients = (
   ingredients: Array<IngredientPrisma> | undefined

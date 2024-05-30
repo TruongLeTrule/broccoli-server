@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { CreateOrUpdateMealDto } from '../types/meal.type';
+import { CreateOrUpdateMealDto } from '../dtos/meal.dto';
 
 const prisma = new PrismaClient();
 

@@ -1,4 +1,4 @@
-import { CreateOrUpdateMealDto } from '../types/meal.type';
+import { CreateOrUpdateMealDto } from '../dtos/meal.dto';
 import {
   findAllMealsRepository,
   findMealSpecificByIdRepository,

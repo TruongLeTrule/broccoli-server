@@ -1,5 +1,5 @@
 import { PrismaClient, ingredientType } from '@prisma/client';
-import { IngredientNutrientRequest } from '../types/ingredient.type';
+import { CreateOrUpdateIngredientDto } from '../dtos/ingredient.dto';
 
 const prisma = new PrismaClient();
 
@@ -48,7 +48,7 @@ export const findIngredientSpecificByIdRepository = async (
 export const createIngredientRepository = async (
   ingredientName: string,
   ingredientType: ingredientType,
-  ingredients: Array<IngredientNutrientRequest>
+  ingredients: Array<CreateOrUpdateIngredientDto>
 ) => {
   await prisma.ingredient.create({
     data: {
