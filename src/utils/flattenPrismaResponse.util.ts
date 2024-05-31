@@ -7,6 +7,7 @@ export const flattenIngredients = (
     ({ ingredientValue, ingredientUnit, ingredient }) => ({
       ingredientValue,
       ingredientUnit,
+      ingredientId: ingredient.ingredientId,
       ingredientName: ingredient.ingredientName,
       ingredientType: ingredient.ingredientType,
     })

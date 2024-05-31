@@ -30,6 +30,7 @@ export const findMealSpecificByIdRepository = async (mealId: number) => {
           ingredientUnit: true,
           ingredient: {
             select: {
+              ingredientId: true,
               ingredientName: true,
               ingredientType: true,
             },

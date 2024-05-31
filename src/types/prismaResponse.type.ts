@@ -9,6 +9,7 @@ export interface IngredientPrisma {
   ingredientValue: number;
   ingredientUnit: ingredientUnit;
   ingredient: {
+    ingredientId: number;
     ingredientName: string;
     ingredientType: ingredientType | null;
   };
