@@ -1,12 +1,6 @@
 import { findMealByIdRepository } from '../repositories/meal.repository';
 import { MealIngredientPrisma } from '../types/prismaResponse.type';
-import { nutrientUnit } from '@prisma/client';
-
-interface MealNutrient {
-  nutrientName: string;
-  nutrientUnit: nutrientUnit | null;
-  nutrientValue: number;
-}
+import { CleanMealNutrient } from '../types/cleanResponse.type';
 
 const cleanMealIngredients = (ingredients: Array<MealIngredientPrisma>) => {
   return ingredients.map(({ ingredientUnit, ingredientValue, ingredient }) => {
@@ -22,7 +16,7 @@ const cleanMealIngredients = (ingredients: Array<MealIngredientPrisma>) => {
 };
 
 const handleMealNutrients = (ingredients: Array<MealIngredientPrisma>) => {
-  let mealNutrients: Array<MealNutrient> = [];
+  let mealNutrients: Array<CleanMealNutrient> = [];
 
   ingredients.forEach(
     ({ ingredient, ingredientValue, ingredientUnitCovert }) => {
@@ -44,21 +38,16 @@ const handleMealNutrients = (ingredients: Array<MealIngredientPrisma>) => {
         }
       );
 
-      if (!mealNutrients.length) {
-        mealNutrients = handledNutrients;
-      } else {
-        mealNutrients = mealNutrients.map(
-          ({ nutrientName, nutrientUnit, nutrientValue }) => ({
-            // Find and add nutrient value if nutrient name is equal
-            nutrientValue: (nutrientValue +=
-              handledNutrients.find(
-                (item) => item.nutrientName === nutrientName
-              )?.nutrientValue || 0),
-            nutrientUnit,
-            nutrientName,
-          })
-        );
-      }
+      mealNutrients = handledNutrients.map(
+        ({ nutrientName, nutrientUnit, nutrientValue }) => ({
+          // Find and add nutrient value if nutrient name is equal
+          nutrientValue: (nutrientValue +=
+            mealNutrients.find((item) => item.nutrientName === nutrientName)
+              ?.nutrientValue || 0),
+          nutrientUnit,
+          nutrientName,
+        })
+      );
     }
   );
 
@@ -72,7 +61,7 @@ const findMealSpecificService = async (id: number) => {
     meal?.ingredients as Array<MealIngredientPrisma>
   );
 
-  const mealNutrients: Array<MealNutrient> = handleMealNutrients(
+  const mealNutrients: Array<CleanMealNutrient> = handleMealNutrients(
     meal?.ingredients as Array<MealIngredientPrisma>
   );
 
