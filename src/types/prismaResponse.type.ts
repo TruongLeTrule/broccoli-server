@@ -34,3 +34,15 @@ export interface IngredientNutrientPrisma {
     nutrientUnit: nutrientUnit;
   };
 }
+
+export interface UserTargetNutrientPrisma {
+  nutrients: Array<{
+    targetNutrientValue: number;
+    nutrient: {
+      nutrientId: number;
+      nutrientName: string;
+      nutrientType: nutrientType;
+      nutrientUnit: nutrientUnit;
+    };
+  }>;
+}
