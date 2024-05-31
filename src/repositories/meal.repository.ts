@@ -1,23 +1,27 @@
 import { PrismaClient } from '@prisma/client';
-import {
-  MealIngredientRequest,
-  MealIngredient,
-} from '../types/mealIngredient.type';
+import { CreateOrUpdateMealDto } from '../dtos/meal.dto';
 
 const prisma = new PrismaClient();
 
-export const findAllMealsRepository = async (page: number, limit: number) => {
-  const meals = await prisma.meal.findMany({
+export const findAllMealsRepository = async (
+  page: number | undefined,
+  limit: number | undefined
+) => {
+  if (!page) return await prisma.meal.findMany();
+
+  limit = limit ? limit : 12;
+  page = (page - 1) * limit;
+
+  return await prisma.meal.findMany({
     skip: page,
     take: limit,
   });
-  return meals;
 };
 
-export const findMealSpecificByIdRepository = async (id: number) => {
+export const findMealSpecificByIdRepository = async (mealId: number) => {
   const meal = await prisma.meal.findFirst({
     where: {
-      id,
+      mealId,
     },
     include: {
       ingredients: {
@@ -26,6 +30,7 @@ export const findMealSpecificByIdRepository = async (id: number) => {
           ingredientUnit: true,
           ingredient: {
             select: {
+              ingredientId: true,
               ingredientName: true,
               ingredientType: true,
             },
@@ -48,16 +53,42 @@ export const findMealByNameRepository = async (mealName: string) => {
   return meals;
 };
 
-export const createMealRepository = async (
-  mealName: string,
-  ingredients: Array<MealIngredient>
+export const createOrUpdateMealRepository = async (
+  createMealRequest: CreateOrUpdateMealDto,
+  id?: number
 ) => {
-  await prisma.meal.create({
+  const { mealName, mealType, ingredients } = createMealRequest;
+
+  if (id)
+    return await prisma.meal.update({
+      where: {
+        mealId: id,
+      },
+      data: {
+        mealName,
+        mealType,
+        ingredients: {
+          deleteMany: {},
+          create: ingredients,
+        },
+      },
+    });
+
+  return await prisma.meal.create({
     data: {
       mealName,
+      mealType,
       ingredients: {
         create: ingredients,
       },
+    },
+  });
+};
+
+export const deleteMealRepository = async (id: number) => {
+  return await prisma.meal.delete({
+    where: {
+      mealId: id,
     },
   });
 };

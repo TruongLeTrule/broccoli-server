@@ -1,45 +1,49 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import {
-  findAllMeals,
-  findMealByName,
-  createMeal,
-  findMealSpecificById,
+  findAllMealsService,
+  findMealByNameService,
+  createMealService,
+  findMealSpecificByIdService,
+  deleteMealService,
+  updateMealService,
 } from '../services/meal.service';
 
-const getAllMeals = async (req: Request, res: Response) => {
-  const { page, limit } = req.query;
-
-  const meals = await findAllMeals(
-    parseInt(page as string),
-    parseInt(limit as string)
+export const getAllMealsController = async (req: Request, res: Response) => {
+  const meals = await findAllMealsService(
+    parseInt(req.query.page as string),
+    parseInt(req.query.limit as string)
   );
 
   res.status(StatusCodes.OK).json({ meals });
 };
 
-const getMealById = async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  const meal = await findMealSpecificById(parseInt(id));
+export const getMealByIdController = async (req: Request, res: Response) => {
+  const meal = await findMealSpecificByIdService(parseInt(req.params.id));
 
   res.status(StatusCodes.OK).json({ meal });
 };
 
-const getMealByName = async (req: Request, res: Response) => {
-  const { mealName } = req.body;
-
-  const meals = await findMealByName(mealName);
+export const getMealByNameController = async (req: Request, res: Response) => {
+  const meals = await findMealByNameService(req.body.mealName);
 
   res.status(StatusCodes.OK).json({ meals });
 };
 
-const postMeal = async (req: Request, res: Response) => {
-  const { mealName, ingredients } = req.body;
+export const postMealController = async (req: Request, res: Response) => {
+  const meal = await createMealService(req.body);
 
-  await createMeal(mealName, ingredients);
-
-  res.status(StatusCodes.CREATED).json({ msg: 'Meal created' });
+  res.status(StatusCodes.CREATED).json({ msg: 'Meal created', meal });
 };
 
-export { getAllMeals, getMealByName, postMeal, getMealById };
+export const deleteMealController = async (req: Request, res: Response) => {
+  const meal = await deleteMealService(parseInt(req.params.id));
+
+  res.status(StatusCodes.OK).json({ msg: 'Meal deleted', meal });
+};
+
+export const updateMealController = async (req: Request, res: Response) => {
+  const meal = await updateMealService(parseInt(req.params.id), req.body);
+
+  res.status(StatusCodes.OK).json({ msg: 'Meal updated', meal });
+};

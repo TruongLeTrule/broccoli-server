@@ -1,45 +1,45 @@
-import {
-  MealIngredient,
-  MealIngredientRequest,
-} from '../types/mealIngredient.type';
-import { flattenMealIngredients } from '../utils/flattenResponse.util';
+import { CreateOrUpdateMealDto } from '../dtos/meal.dto';
 import {
   findAllMealsRepository,
   findMealSpecificByIdRepository,
   findMealByNameRepository,
-  createMealRepository,
+  createOrUpdateMealRepository,
+  deleteMealRepository,
 } from '../repositories/meal.repository';
+import { flattenIngredients } from '../utils/flattenPrismaResponse.util';
 
-const findAllMeals = async (page: number | null, limit: number | null) => {
-  limit = limit ? limit : 12;
-  page = page ? (page - 1) * limit : 0;
-
+export const findAllMealsService = async (
+  page: number | undefined,
+  limit: number | undefined
+) => {
   return await findAllMealsRepository(page, limit);
 };
 
-const findMealSpecificById = async (id: number) => {
+export const findMealSpecificByIdService = async (id: number) => {
   const meal = await findMealSpecificByIdRepository(id);
 
-  return { ...meal, ingredients: flattenMealIngredients(meal?.ingredients) };
+  const flatMealIngredients = flattenIngredients(meal?.ingredients);
+
+  return { ...meal, ingredients: flatMealIngredients };
 };
 
-const findMealByName = async (mealName: string) => {
+export const findMealByNameService = async (mealName: string) => {
   return await findMealByNameRepository(mealName);
 };
 
-const createMeal = async (
-  mealName: string,
-  ingredients: Array<MealIngredientRequest>
+export const createMealService = async (
+  createMealRequest: CreateOrUpdateMealDto
 ) => {
-  const handledIngredients: Array<MealIngredient> = ingredients.map(
-    ({ id, ingredientValue, ingredientUnit }) => ({
-      ingredientValue,
-      ingredientUnit,
-      ingredientId: id,
-    })
-  );
-
-  await createMealRepository(mealName, handledIngredients);
+  return await createOrUpdateMealRepository(createMealRequest);
 };
 
-export { findAllMeals, findMealByName, createMeal, findMealSpecificById };
+export const updateMealService = async (
+  id: number,
+  newMeal: CreateOrUpdateMealDto
+) => {
+  return await createOrUpdateMealRepository(newMeal, id);
+};
+
+export const deleteMealService = async (id: number) => {
+  return await deleteMealRepository(id);
+};

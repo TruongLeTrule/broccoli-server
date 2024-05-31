@@ -9,7 +9,7 @@ datasource db {
 }
 
 model User {
-  id             String  @id @default(uuid())
+  userId         String  @id @default(uuid())
   username       String  @unique
   fullName       String
   hashedPassword String
@@ -22,63 +22,63 @@ model User {
 }
 
 model UserPhysicalStat {
-  id         String     @id @default(uuid())
-  age        Int
-  gender     gender
-  height     Float
-  heightUnit heightUnit @default(cm)
-  weightInKg Float
-  tdee       Int
+  userPhysicalStatId String     @id @default(uuid())
+  age                Int
+  gender             gender
+  height             Float
+  heightUnit         heightUnit @default(cm)
+  weightInKg         Float
+  tdee               Int
 
-  activityLevel   ActivityLevel? @relation(fields: [activityLevelId], references: [id])
+  activityLevel   ActivityLevel? @relation(fields: [activityLevelId], references: [activityLevelId])
   activityLevelId Int
-  user            User           @relation(fields: [userId], references: [id])
+  user            User           @relation(fields: [userId], references: [userId])
   userId          String         @unique
 }
 
 model ActivityLevel {
-  id                Int    @id @default(autoincrement())
+  activityLevelId   Int    @id @default(autoincrement())
   activityLevelType String @unique
 
   userPhysicalStats UserPhysicalStat[]
 }
 
 model ChosenMeal {
-  id          String   @id @default(uuid())
-  mealTime    mealTime
-  quantity    Float
-  appliedDate DateTime
+  chosenMealId String   @id @default(uuid())
+  mealTime     mealTime
+  quantity     Float
+  appliedDate  DateTime
 
-  meal   Meal   @relation(fields: [mealId], references: [id])
+  meal   Meal   @relation(fields: [mealId], references: [mealId])
   mealId Int
-  users  User?  @relation(fields: [userId], references: [id])
+  users  User?  @relation(fields: [userId], references: [userId])
   userId String
 
   @@unique([userId, mealTime, appliedDate])
 }
 
 model Meal {
-  id       Int      @id @default(autoincrement())
+  mealId   Int      @id @default(autoincrement())
   mealName String   @unique
   mealType mealType @default(food)
   imgURL   String?
 
   createdBy String?
-  user      User?   @relation(fields: [createdBy], references: [id])
+  user      User?   @relation(fields: [createdBy], references: [userId])
 
   ingredients MealIngredient[]
   chosenMeals ChosenMeal[]
 }
 
 model MealIngredient {
-  id              Int            @id @default(autoincrement())
-  ingredientValue Float
-  ingredientUnit  ingredientUnit @default(g)
+  mealIngredientId Int            @id @default(autoincrement())
+  ingredientValue  Float
+  ingredientUnit   ingredientUnit @default(g)
 
   ingredientUnitCovert IngredientUnitCovert @relation(fields: [ingredientUnit], references: [ingredientUnit])
-  meal                 Meal                 @relation(fields: [mealId], references: [id])
+  meal                 Meal                 @relation(fields: [mealId], references: [mealId], onDelete: Cascade)
   mealId               Int
-  ingredient           Ingredient           @relation(fields: [ingredientId], references: [id])
+  ingredient           Ingredient           @relation(fields: [ingredientId], references: [ingredientId], onDelete: Cascade)
   ingredientId         Int
 
   @@unique([mealId, ingredientId])
@@ -92,31 +92,31 @@ model IngredientUnitCovert {
 }
 
 model Ingredient {
-  id             Int             @id @default(autoincrement())
+  ingredientId   Int             @id @default(autoincrement())
   ingredientName String
   ingredientType ingredientType?
 
   createdBy String?
-  user      User?   @relation(fields: [createdBy], references: [id])
+  user      User?   @relation(fields: [createdBy], references: [userId])
 
   nutrients IngredientNutrient[]
   meals     MealIngredient[]
 }
 
 model IngredientNutrient {
-  id                  Int   @id @default(autoincrement())
-  nutrientValueOn100g Float
+  ingredientNutrientId Int   @id @default(autoincrement())
+  nutrientValueOn100g  Float
 
-  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [ingredientId], onDelete: Cascade)
   ingredientId Int
-  nutrient     Nutrient   @relation(fields: [nutrientId], references: [id])
+  nutrient     Nutrient   @relation(fields: [nutrientId], references: [nutrientId])
   nutrientId   Int
 
   @@unique([ingredientId, nutrientId])
 }
 
 model Nutrient {
-  id           Int          @id @default(autoincrement())
+  nutrientId   Int          @id @default(autoincrement())
   nutrientName String       @unique
   nutrientType nutrientType @default(macro)
   nutrientUnit nutrientUnit @default(g)
