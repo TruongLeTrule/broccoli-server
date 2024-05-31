@@ -1,4 +1,4 @@
-import { findMealSpecificByIdRepository } from '../repositories/meal.repository';
+import { findMealByIdRepository } from '../repositories/meal.repository';
 import {
   CleanedIngredientNutrient,
   MealIngredientPrisma,
@@ -8,8 +8,8 @@ import {
   cleanMealNutrients,
 } from '../utils/cleanPrismaResponse.util';
 
-export const findMealSpecificByIdService = async (id: number) => {
-  const meal = await findMealSpecificByIdRepository(id);
+const findMealSpecificService = async (id: number) => {
+  const meal = await findMealByIdRepository(id);
 
   const mealIngredients = cleanMealIngredients(
     meal?.ingredients as Array<MealIngredientPrisma>
@@ -22,3 +22,5 @@ export const findMealSpecificByIdService = async (id: number) => {
     ingredients: mealIngredients,
   };
 };
+
+export { findMealSpecificService };

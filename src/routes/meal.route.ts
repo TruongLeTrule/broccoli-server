@@ -1,8 +1,8 @@
 import express from 'express';
 import {
-  findAllMealsController,
+  findMealsController,
   findMealByNameController,
-  postMealController,
+  createMealController,
   findMealByIdController,
   updateMealController,
   deleteMealController,
@@ -10,7 +10,7 @@ import {
 
 const router = express.Router();
 
-router.route('/').get(findAllMealsController).post(postMealController);
+router.route('/').get(findMealsController).post(createMealController);
 router
   .route('/:id')
   .get(findMealByIdController)

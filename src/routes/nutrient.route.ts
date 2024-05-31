@@ -1,8 +1,8 @@
 import express from 'express';
-import { findAllNutrientsController } from '../controllers/nutrient.controller';
+import { findNutrientsController } from '../controllers/nutrient.controller';
 
 const router = express.Router();
 
-router.route('/').get(findAllNutrientsController);
+router.route('/').get(findNutrientsController);
 
 export default router;

@@ -1,9 +1,9 @@
 import express from 'express';
 import {
-  findAllIngredientsController,
+  findIngredientsController,
   findIngredientByNameController,
   findIngredientByIdController,
-  postIngredientController,
+  createIngredientController,
   updateIngredientController,
   deleteIngredientController,
 } from '../controllers/ingredient.controller';
@@ -12,8 +12,8 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(findAllIngredientsController)
-  .post(postIngredientController);
+  .get(findIngredientsController)
+  .post(createIngredientController);
 router
   .route('/:id')
   .get(findIngredientByIdController)

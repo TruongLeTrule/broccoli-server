@@ -7,7 +7,7 @@ import { hashPassword } from '../utils/password.util';
 import { comparePassword } from '../utils/password.util';
 import { BadRequestError, NotFoundError } from '../utils/customErrors';
 
-export const registerService = async (
+const registerService = async (
   username: string,
   password: string,
   fullName: string
@@ -20,7 +20,7 @@ export const registerService = async (
   return await createUserRepository(username, hashedPassword, fullName);
 };
 
-export const loginService = async (username: string, password: string) => {
+const loginService = async (username: string, password: string) => {
   const foundUser = await findUniqueUserRepository(username);
   if (!foundUser) throw new NotFoundError('wrong username or password');
 
@@ -36,3 +36,5 @@ export const loginService = async (username: string, password: string) => {
     imgUrl: foundUser.imgUrl,
   });
 };
+
+export { loginService, registerService };
