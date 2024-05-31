@@ -1,42 +1,21 @@
-import {
-  findAllIngredientsRepository,
-  findIngredientByNameRepository,
-  findIngredientSpecificByIdRepository,
-  createOrUpdateIngredientRepository,
-  deleteIngredientRepository,
-} from '../repositories/ingredient.repository';
-import { CreateOrUpdateIngredientDto } from '../dtos/ingredient.dto';
-import { flattenNutrients } from '../utils/flattenPrismaResponse.util';
+import { findIngredientByIdRepository } from '../repositories/ingredient.repository';
+import { IngredientNutrientPrisma } from '../types/prismaResponse.type';
 
-export const findAllIngredientsService = async () => {
-  return await findAllIngredientsRepository();
+const cleanIngredientNutrients = (
+  nutrients: Array<IngredientNutrientPrisma> | undefined
+) => {
+  return nutrients?.map(({ nutrient, nutrientValueOn100g }) => ({
+    nutrientValueOn100g,
+    ...nutrient,
+  }));
 };
 
-export const findIngredientByNameService = async (ingredientName: string) => {
-  return await findIngredientByNameRepository(ingredientName);
-};
+const findIngredientSpecificService = async (id: number) => {
+  const ingredient = await findIngredientByIdRepository(id);
 
-export const findIngredientSpecificByIdService = async (id: number) => {
-  const ingredient = await findIngredientSpecificByIdRepository(id);
-
-  const flatNutrients = flattenNutrients(ingredient?.nutrients);
+  const flatNutrients = cleanIngredientNutrients(ingredient?.nutrients);
 
   return { ...ingredient, nutrients: flatNutrients };
 };
 
-export const createIngredientService = async (
-  createIngredientRequest: CreateOrUpdateIngredientDto
-) => {
-  return await createOrUpdateIngredientRepository(createIngredientRequest);
-};
-
-export const updateIngredientService = async (
-  createIngredientRequest: CreateOrUpdateIngredientDto,
-  id: number
-) => {
-  return await createOrUpdateIngredientRepository(createIngredientRequest, id);
-};
-
-export const deleteIngredientService = async (id: number) => {
-  return await deleteIngredientRepository(id);
-};
+export { findIngredientSpecificService };

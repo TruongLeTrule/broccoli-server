@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { oneDay } from '../utils/constants.util';
-import { registerService, loginService } from '../services/user.service';
+import { registerService, loginService } from '../services/auth.service';
 import { BadRequestError } from '../utils/customErrors';
 
 const loginController = async (req: Request, res: Response) => {
