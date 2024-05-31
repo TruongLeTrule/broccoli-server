@@ -18,6 +18,7 @@ model User {
   mealPlans          ChosenMeal[]
   createdMeals       Meal[]
   createdIngredients Ingredient[]
+  nutrients          UserTargetNutrient[]
   userPhysicalStat   UserPhysicalStat?
 }
 
@@ -115,6 +116,16 @@ model IngredientNutrient {
   @@unique([ingredientId, nutrientId])
 }
 
+model UserTargetNutrient {
+  userTargetNutrientId String @id @default(uuid())
+  targetNutrientValue  Float
+
+  user       User     @relation(fields: [userId], references: [userId])
+  userId     String
+  nutrient   Nutrient @relation(fields: [nutrientId], references: [nutrientId])
+  nutrientId Int
+}
+
 model Nutrient {
   nutrientId   Int          @id @default(autoincrement())
   nutrientName String       @unique
@@ -122,6 +133,7 @@ model Nutrient {
   nutrientUnit nutrientUnit @default(g)
 
   ingredients IngredientNutrient[]
+  users       UserTargetNutrient[]
 }
 
 enum nutrientType {

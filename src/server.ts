@@ -11,10 +11,13 @@ import cors from 'cors';
 import helmet from 'helmet';
 
 // Import routes
-import authRoute from './routes/auth.route';
-import mealRoute from './routes/meal.route';
-import ingredientRoute from './routes/ingredient.route';
-import nutrientRoute from './routes/nutrient.route';
+import {
+  authRoute,
+  ingredientRoute,
+  mealRoute,
+  nutrientRoute,
+  userRoute,
+} from './routes';
 
 dotenv.config();
 
@@ -37,6 +40,7 @@ app.use(`${BASE_URL}/auth`, authRoute);
 app.use(`${BASE_URL}/meals`, mealRoute);
 app.use(`${BASE_URL}/ingredients`, ingredientRoute);
 app.use(`${BASE_URL}/nutrients`, nutrientRoute);
+app.use(`${BASE_URL}/user`, userRoute);
 
 // Error handlers
 app.use('*', (req, res) => {
