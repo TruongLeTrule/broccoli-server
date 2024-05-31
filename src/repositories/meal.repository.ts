@@ -23,16 +23,30 @@ export const findMealSpecificByIdRepository = async (mealId: number) => {
     where: {
       mealId,
     },
-    include: {
+    select: {
+      mealName: true,
+      mealType: true,
+      imgURL: true,
       ingredients: {
         select: {
           ingredientValue: true,
           ingredientUnit: true,
+          ingredientUnitCovert: {
+            select: {
+              covertToGrams: true,
+            },
+          },
           ingredient: {
             select: {
               ingredientId: true,
               ingredientName: true,
               ingredientType: true,
+              nutrients: {
+                select: {
+                  nutrientValueOn100g: true,
+                  nutrient: true,
+                },
+              },
             },
           },
         },

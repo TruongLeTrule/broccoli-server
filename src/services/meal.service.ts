@@ -6,7 +6,14 @@ import {
   createOrUpdateMealRepository,
   deleteMealRepository,
 } from '../repositories/meal.repository';
-import { flattenIngredients } from '../utils/flattenPrismaResponse.util';
+import {
+  CleanedIngredientNutrient,
+  MealIngredientPrisma,
+} from '../types/prismaResponse.type';
+import {
+  cleanMealIngredients,
+  cleanMealNutrients,
+} from '../utils/cleanPrismaResponse.util';
 
 export const findAllMealsService = async (
   page: number | undefined,
@@ -18,9 +25,16 @@ export const findAllMealsService = async (
 export const findMealSpecificByIdService = async (id: number) => {
   const meal = await findMealSpecificByIdRepository(id);
 
-  const flatMealIngredients = flattenIngredients(meal?.ingredients);
+  const mealIngredients = cleanMealIngredients(
+    meal?.ingredients as Array<MealIngredientPrisma>
+  );
 
-  return { ...meal, ingredients: flatMealIngredients };
+  return {
+    mealName: meal?.mealName,
+    imgURL: meal?.imgURL,
+    mealType: meal?.mealType,
+    ingredients: mealIngredients,
+  };
 };
 
 export const findMealByNameService = async (mealName: string) => {
