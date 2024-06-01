@@ -9,16 +9,17 @@ datasource db {
 }
 
 model User {
-  userId         String  @id @default(uuid())
-  username       String  @unique
-  fullName       String
-  hashedPassword String
-  imgUrl         String?
+  userId   String   @id @default(uuid())
+  username String   @unique
+  fullName String
+  password String
+  role     userRole
+  imgUrl   String?
 
   mealPlans          ChosenMeal[]
   createdMeals       Meal[]
   createdIngredients Ingredient[]
-  nutrients          UserTargetNutrient[]
+  targetNutrients    UserTargetNutrient[]
   userPhysicalStat   UserPhysicalStat?
 }
 
@@ -38,8 +39,8 @@ model UserPhysicalStat {
 }
 
 model ActivityLevel {
-  activityLevelId   Int    @id @default(autoincrement())
-  activityLevelType String @unique
+  activityLevelId   Int           @id @default(autoincrement())
+  activityLevelType activityLevel @unique
 
   userPhysicalStats UserPhysicalStat[]
 }
@@ -124,6 +125,8 @@ model UserTargetNutrient {
   userId     String
   nutrient   Nutrient @relation(fields: [nutrientId], references: [nutrientId])
   nutrientId Int
+
+  @@unique([userId, nutrientId])
 }
 
 model Nutrient {
@@ -200,4 +203,9 @@ enum activityLevel {
   low
   medium
   high
+}
+
+enum userRole {
+  admin
+  user
 }

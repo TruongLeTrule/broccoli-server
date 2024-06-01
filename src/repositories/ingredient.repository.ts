@@ -3,6 +3,14 @@ import { CreateOrUpdateIngredientDto } from '../dtos/ingredient.dto';
 
 const prisma = new PrismaClient();
 
+const findUniqueIngredientsRepository = async (id: string | number) => {
+  return await prisma.ingredient.findUnique({
+    where: {
+      ingredientId: Number(id),
+    },
+  });
+};
+
 const findIngredientsRepository = async () => {
   return await prisma.ingredient.findMany({
     select: {
@@ -24,10 +32,10 @@ const findIngredientByNameRepository = async (ingredientName: string) => {
   return ingredients;
 };
 
-const findIngredientByIdRepository = async (ingredientId: number) => {
+const findIngredientByIdRepository = async (ingredientId: string | number) => {
   return await prisma.ingredient.findFirst({
     where: {
-      ingredientId,
+      ingredientId: Number(ingredientId),
     },
     include: {
       nutrients: {
@@ -42,14 +50,14 @@ const findIngredientByIdRepository = async (ingredientId: number) => {
 
 const createOrUpdateIngredientRepository = async (
   createIngredientRequest: CreateOrUpdateIngredientDto,
-  id?: number
+  id?: string | number
 ) => {
   const { ingredientName, ingredientType, nutrients } = createIngredientRequest;
 
   if (id)
     return await prisma.ingredient.update({
       where: {
-        ingredientId: id,
+        ingredientId: Number(id),
       },
       data: {
         ingredientName,
@@ -72,10 +80,10 @@ const createOrUpdateIngredientRepository = async (
   });
 };
 
-const deleteIngredientRepository = (id: number) => {
+const deleteIngredientRepository = (id: number | string) => {
   return prisma.ingredient.delete({
     where: {
-      ingredientId: id,
+      ingredientId: Number(id),
     },
   });
 };
@@ -86,4 +94,5 @@ export {
   findIngredientByIdRepository,
   deleteIngredientRepository,
   createOrUpdateIngredientRepository,
+  findUniqueIngredientsRepository,
 };

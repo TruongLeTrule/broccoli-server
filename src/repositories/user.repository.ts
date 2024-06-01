@@ -1,26 +1,44 @@
 import { PrismaClient } from '@prisma/client';
-import { CreateUserTargetDto } from '../dtos/user.dto';
+import {
+  CreateUserTargetDto,
+  CreateUserDto,
+  UpdateUserDto,
+} from '../dtos/user.dto';
 
 const prisma = new PrismaClient();
 
-const createUserRepository = async (
-  username: string,
-  hashedPassword: string,
-  fullName: string
-) => {
+const getUserCountRepository = async () => {
+  return await prisma.user.count();
+};
+
+const createUserRepository = async (user: CreateUserDto) => {
   return await prisma.user.create({
-    data: {
-      username,
-      hashedPassword,
-      fullName,
-    },
+    data: user,
   });
 };
 
-const findUniqueUserRepository = async (username: string) => {
+const updateUserRepository = async (userId: string, user: UpdateUserDto) => {
+  return await prisma.user.update({
+    where: {
+      userId,
+    },
+    data: user,
+  });
+};
+
+const findUserByUsernameRepository = async (username: string) => {
   const user = await prisma.user.findUnique({
     where: {
       username,
+    },
+  });
+  return user;
+};
+
+const findUserByIdRepository = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      userId,
     },
   });
   return user;
@@ -32,7 +50,7 @@ const findUserTargetRepository = async (userId: string) => {
       userId,
     },
     select: {
-      nutrients: {
+      targetNutrients: {
         select: {
           targetNutrientValue: true,
           nutrient: true,
@@ -53,7 +71,7 @@ const createOrUpdateUserTargetRepository = async (
       userId,
     },
     data: {
-      nutrients: {
+      targetNutrients: {
         deleteMany: {},
         create: nutrients,
       },
@@ -63,7 +81,10 @@ const createOrUpdateUserTargetRepository = async (
 
 export {
   createUserRepository,
-  findUniqueUserRepository,
+  findUserByUsernameRepository,
+  findUserByIdRepository,
   findUserTargetRepository,
   createOrUpdateUserTargetRepository,
+  getUserCountRepository,
+  updateUserRepository,
 };

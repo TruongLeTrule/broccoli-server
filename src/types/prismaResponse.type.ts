@@ -36,7 +36,7 @@ export interface IngredientNutrientPrisma {
 }
 
 export interface UserTargetNutrientPrisma {
-  nutrients: Array<{
+  targetNutrients: Array<{
     targetNutrientValue: number;
     nutrient: {
       nutrientId: number;

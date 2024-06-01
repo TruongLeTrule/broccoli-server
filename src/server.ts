@@ -9,6 +9,7 @@ import errorHandlerMiddleware from './middlewares/errorHandler.middleware';
 import { NotFoundError } from './utils/customErrors';
 import cors from 'cors';
 import helmet from 'helmet';
+import { authenticateMiddleware } from './middlewares/authentication.middleware';
 
 // Import routes
 import {
@@ -40,7 +41,7 @@ app.use(`${BASE_URL}/auth`, authRoute);
 app.use(`${BASE_URL}/meals`, mealRoute);
 app.use(`${BASE_URL}/ingredients`, ingredientRoute);
 app.use(`${BASE_URL}/nutrients`, nutrientRoute);
-app.use(`${BASE_URL}/user`, userRoute);
+app.use(`${BASE_URL}/user`, authenticateMiddleware, userRoute);
 
 // Error handlers
 app.use('*', (req, res) => {

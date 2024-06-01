@@ -3,6 +3,14 @@ import { CreateOrUpdateMealDto } from '../dtos/meal.dto';
 
 const prisma = new PrismaClient();
 
+const findUniqueMealRepository = (id: string | number) => {
+  return prisma.meal.findUnique({
+    where: {
+      mealId: Number(id),
+    },
+  });
+};
+
 const findMealsRepository = async (
   page: number | undefined,
   limit: number | undefined
@@ -18,10 +26,10 @@ const findMealsRepository = async (
   });
 };
 
-const findMealByIdRepository = async (mealId: number) => {
+const findMealByIdRepository = async (mealId: number | string) => {
   const meal = await prisma.meal.findFirst({
     where: {
-      mealId,
+      mealId: Number(mealId),
     },
     select: {
       mealName: true,
@@ -69,14 +77,14 @@ const findMealByNameRepository = async (mealName: string) => {
 
 const createOrUpdateMealRepository = async (
   createMealRequest: CreateOrUpdateMealDto,
-  id?: number
+  id?: number | string
 ) => {
   const { mealName, mealType, ingredients } = createMealRequest;
 
   if (id)
     return await prisma.meal.update({
       where: {
-        mealId: id,
+        mealId: Number(id),
       },
       data: {
         mealName,
@@ -99,10 +107,10 @@ const createOrUpdateMealRepository = async (
   });
 };
 
-const deleteMealRepository = async (id: number) => {
+const deleteMealRepository = async (id: number | string) => {
   return await prisma.meal.delete({
     where: {
-      mealId: id,
+      mealId: Number(id),
     },
   });
 };
@@ -113,4 +121,5 @@ export {
   findMealByNameRepository,
   createOrUpdateMealRepository,
   deleteMealRepository,
+  findUniqueMealRepository,
 };

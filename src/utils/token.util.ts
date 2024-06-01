@@ -1,8 +1,10 @@
+import { userRole } from '@prisma/client';
 import jwt, { Secret } from 'jsonwebtoken';
 
 interface JwtPayload {
   exp: number;
   userId: string;
+  role: userRole;
 }
 
 const createToken = (payload: Object) => {
