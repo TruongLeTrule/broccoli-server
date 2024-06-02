@@ -11,7 +11,7 @@ datasource db {
 model User {
   userId   String   @id @default(uuid())
   username String   @unique
-  fullName String
+  fullName String?
   password String
   role     userRole
   imgUrl   String?

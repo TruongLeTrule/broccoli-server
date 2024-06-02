@@ -28,7 +28,7 @@ const loginController = async (req: Request, res: Response) => {
   const isValidUser =
     user && (await comparePassword(req.body.password, user.password));
 
-  if (!isValidUser) throw new NotFoundError('wrong username or password');
+  if (!isValidUser) throw new NotFoundError('Sai tên đăng nhập hoặc mật khẩu');
 
   const token = createToken({
     userId: user.userId,

@@ -10,6 +10,7 @@ import { findUniqueMealRepository } from '../repositories/meal.repository';
 import { BadRequestError, NotFoundError } from '../utils/customErrors';
 import { findUniqueIngredientsRepository } from '../repositories/ingredient.repository';
 import { findUserByUsernameRepository } from '../repositories/user.repository';
+import { errorMessages } from '../utils/constants.util';
 
 export const checkValidation: RequestHandler = (
   req: Request,
@@ -28,41 +29,40 @@ export const checkValidation: RequestHandler = (
 };
 
 export const validateLogin: ValidationChain[] = [
-  body('username').notEmpty().withMessage('username is required'),
-  body('password').notEmpty().withMessage('password is required'),
+  body('username').notEmpty().withMessage(errorMessages.usernameRequired),
+  body('password').notEmpty().withMessage(errorMessages.passwordRequired),
 ];
 
 export const validateRegister: ValidationChain[] = [
   body('username')
     .notEmpty()
-    .withMessage('username is required')
+    .withMessage(errorMessages.usernameRequired)
     .isLength({ min: 6 })
-    .withMessage('username must be at least 6 characters long')
+    .withMessage(errorMessages.usernameLength)
     .custom(async (value) => {
       const isUsernameExist = await findUserByUsernameRepository(value);
       if (isUsernameExist)
-        throw new BadRequestError(`username ${value} already exists`);
+        throw new BadRequestError(errorMessages.existUsername);
     }),
   body('password')
     .notEmpty()
-    .withMessage('password is required')
+    .withMessage(errorMessages.passwordRequired)
     .isLength({ min: 6 })
-    .withMessage('username must be at least 6 characters long'),
-  body('fullName').notEmpty().withMessage('fullName is required'),
+    .withMessage(errorMessages.passwordLength),
 ];
 
 export const validateUpdateUser: ValidationChain[] = [
   body('username')
     .notEmpty()
-    .withMessage('username is required')
+    .withMessage(errorMessages.usernameRequired)
     .isLength({ min: 6 })
-    .withMessage('username must be at least 6 characters long')
+    .withMessage(errorMessages.usernameLength)
     .custom(async (username, { req }) => {
       const user = await findUserByUsernameRepository(username);
       if (user && user.userId === req.user.userId)
-        throw new BadRequestError(`username ${username} already exists`);
+        throw new BadRequestError(errorMessages.existUsername);
     }),
-  body('fullName').notEmpty().withMessage('fullName is required'),
+  body('fullName').notEmpty().withMessage(errorMessages.fullNameRequired),
 ];
 
 export const validateCreateOrUpdateIngredient: ValidationChain[] = [

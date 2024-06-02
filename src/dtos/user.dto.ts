@@ -10,7 +10,6 @@ export interface CreateUserTargetDto {
 export interface CreateUserDto {
   username: string;
   password: string;
-  fullName: string;
   role: userRole;
 }
 
