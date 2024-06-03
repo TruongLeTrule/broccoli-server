@@ -2,14 +2,15 @@ import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { findMealSpecificService } from '../services/meal.service';
 import {
-  findMealsRepository,
+  findMealsPaginationRepository,
   findMealByNameRepository,
   createOrUpdateMealRepository,
   deleteMealRepository,
 } from '../repositories/meal.repository';
+import { mealTimeEnum } from '@prisma/client';
 
 const findMealsController = async (req: Request, res: Response) => {
-  const meals = await findMealsRepository(
+  const meals = await findMealsPaginationRepository(
     parseInt(req.query.page as string),
     parseInt(req.query.limit as string)
   );
@@ -30,7 +31,10 @@ const findMealByNameController = async (req: Request, res: Response) => {
 };
 
 const createMealController = async (req: Request, res: Response) => {
-  const meal = await createOrUpdateMealRepository(req.body);
+  const mealTimes = req.body?.mealTimes.map((mealTime: mealTimeEnum) => ({
+    mealTime,
+  }));
+  const meal = await createOrUpdateMealRepository({ ...req.body, mealTimes });
 
   res.status(StatusCodes.CREATED).json({ msg: 'Meal created', meal });
 };
@@ -42,8 +46,11 @@ const deleteMealController = async (req: Request, res: Response) => {
 };
 
 const updateMealController = async (req: Request, res: Response) => {
+  const mealTimes = req.body?.mealTimes.map((mealTime: mealTimeEnum) => ({
+    mealTime,
+  }));
   const meal = await createOrUpdateMealRepository(
-    req.body,
+    { ...req.body, mealTimes },
     parseInt(req.params.id)
   );
 

@@ -1,7 +1,19 @@
-import { PrismaClient, mealTimeEnum } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { CreateOrUpdateMealDto } from '../dtos/meal.dto';
 
 const prisma = new PrismaClient();
+
+const findAllMealWithMealTimeRepository = () => {
+  return prisma.meal.findMany({
+    include: {
+      availableMealTimes: {
+        select: {
+          mealTime: true,
+        },
+      },
+    },
+  });
+};
 
 const findUniqueMealRepository = (id: string | number) => {
   return prisma.meal.findUnique({
@@ -11,7 +23,7 @@ const findUniqueMealRepository = (id: string | number) => {
   });
 };
 
-const findMealsRepository = async (
+const findMealsPaginationRepository = async (
   page: number | undefined,
   limit: number | undefined
 ) => {
@@ -124,10 +136,11 @@ const deleteMealRepository = async (id: number | string) => {
 };
 
 export {
-  findMealsRepository,
+  findMealsPaginationRepository,
   findMealByIdRepository,
   findMealByNameRepository,
   createOrUpdateMealRepository,
   deleteMealRepository,
   findUniqueMealRepository,
+  findAllMealWithMealTimeRepository,
 };
