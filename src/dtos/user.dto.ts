@@ -1,4 +1,4 @@
-import { userRole } from '@prisma/client';
+import { userRoleEnum } from '@prisma/client';
 
 export interface CreateUserTargetDto {
   nutrients: Array<{
@@ -10,7 +10,7 @@ export interface CreateUserTargetDto {
 export interface CreateUserDto {
   username: string;
   password: string;
-  role: userRole;
+  role: userRoleEnum;
 }
 
 export interface UpdateUserDto {

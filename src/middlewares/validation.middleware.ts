@@ -5,7 +5,7 @@ import {
   ValidationChain,
   param,
 } from 'express-validator';
-import { ingredientType, mealType } from '@prisma/client';
+import { ingredientTypeEnum, mealTimeEnum, mealTypeEnum } from '@prisma/client';
 import { findUniqueMealRepository } from '../repositories/meal.repository';
 import { BadRequestError, NotFoundError } from '../utils/customErrors';
 import { findUniqueIngredientsRepository } from '../repositories/ingredient.repository';
@@ -68,9 +68,9 @@ export const validateUpdateUser: ValidationChain[] = [
 export const validateCreateOrUpdateIngredient: ValidationChain[] = [
   body('ingredientName').notEmpty().withMessage('ingredient name is required'),
   body('ingredientType')
-    .isIn(Object.values(ingredientType))
+    .isIn(Object.values(ingredientTypeEnum))
     .withMessage(
-      `ingredient type must be ${Object.values(ingredientType).join(', ')}`
+      `ingredient type must be ${Object.values(ingredientTypeEnum).join(', ')}`
     ),
   body('nutrients')
     .isArray({ min: 1 })
@@ -83,10 +83,16 @@ export const validateCreateOrUpdateIngredient: ValidationChain[] = [
 export const validateCreateOrUpdateMeal: ValidationChain[] = [
   body('mealName').notEmpty().withMessage('meal name is required'),
   body('mealType')
-    .isIn(Object.values(mealType))
+    .isIn(Object.values(mealTypeEnum))
     .withMessage(
-      `ingredient type must be ${Object.values(mealType).join(', ')}`
+      `ingredient type must be ${Object.values(mealTypeEnum).join(', ')}`
     ),
+  body('mealTimes')
+    .isArray({ min: 1 })
+    .withMessage('meal must have at least one meal time'),
+  body('mealTimes.*.mealTime')
+    .isIn(Object.values(mealTimeEnum))
+    .withMessage(`meal time must be ${Object.values(mealTimeEnum).join(', ')}`),
   body('ingredients')
     .isArray({ min: 1 })
     .withMessage('meal must have at least one ingredient'),

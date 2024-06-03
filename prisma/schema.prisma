@@ -9,11 +9,11 @@ datasource db {
 }
 
 model User {
-  userId   String   @id @default(uuid())
-  username String   @unique
+  userId   String       @id @default(uuid())
+  username String       @unique
   fullName String?
   password String
-  role     userRole
+  role     userRoleEnum
   imgUrl   String?
 
   mealPlans          ChosenMeal[]
@@ -24,11 +24,11 @@ model User {
 }
 
 model UserPhysicalStat {
-  userPhysicalStatId String     @id @default(uuid())
+  userPhysicalStatId String         @id @default(uuid())
   age                Int
-  gender             gender
+  gender             genderEnum
   height             Float
-  heightUnit         heightUnit @default(cm)
+  heightUnit         heightUnitEnum
   weightInKg         Float
   tdee               Int
 
@@ -39,15 +39,15 @@ model UserPhysicalStat {
 }
 
 model ActivityLevel {
-  activityLevelId   Int           @id @default(autoincrement())
-  activityLevelType activityLevel @unique
+  activityLevelId   Int               @id @default(autoincrement())
+  activityLevelType activityLevelEnum @unique
 
   userPhysicalStats UserPhysicalStat[]
 }
 
 model ChosenMeal {
-  chosenMealId String   @id @default(uuid())
-  mealTime     mealTime
+  chosenMealId String       @id @default(uuid())
+  mealTime     mealTimeEnum
   quantity     Float
   appliedDate  DateTime
 
@@ -60,22 +60,38 @@ model ChosenMeal {
 }
 
 model Meal {
-  mealId   Int      @id @default(autoincrement())
-  mealName String   @unique
-  mealType mealType @default(food)
+  mealId   Int          @id @default(autoincrement())
+  mealName String       @unique
+  mealType mealTypeEnum
   imgURL   String?
 
   createdBy String?
   user      User?   @relation(fields: [createdBy], references: [userId])
 
-  ingredients MealIngredient[]
-  chosenMeals ChosenMeal[]
+  ingredients        MealIngredient[]
+  chosenMeals        ChosenMeal[]
+  availableMealTimes MealTimeOfMeal[]
+}
+
+model MealTimeOfMeal {
+  id Int @id @default(autoincrement())
+
+  mealId        Int
+  meal          Meal          @relation(fields: [mealId], references: [mealId])
+  mealTime      mealTimeEnum
+  mealTimeOfDay MealTimeOfDay @relation(fields: [mealTime], references: [mealTime])
+}
+
+model MealTimeOfDay {
+  mealTime mealTimeEnum @id
+
+  meals MealTimeOfMeal[]
 }
 
 model MealIngredient {
-  mealIngredientId Int            @id @default(autoincrement())
+  mealIngredientId Int                @id @default(autoincrement())
   ingredientValue  Float
-  ingredientUnit   ingredientUnit @default(g)
+  ingredientUnit   ingredientUnitEnum
 
   ingredientUnitCovert IngredientUnitCovert @relation(fields: [ingredientUnit], references: [ingredientUnit])
   meal                 Meal                 @relation(fields: [mealId], references: [mealId], onDelete: Cascade)
@@ -87,16 +103,16 @@ model MealIngredient {
 }
 
 model IngredientUnitCovert {
-  ingredientUnit ingredientUnit @id
+  ingredientUnit ingredientUnitEnum @id
   covertToGrams  Float
 
   mealIngredients MealIngredient[]
 }
 
 model Ingredient {
-  ingredientId   Int             @id @default(autoincrement())
+  ingredientId   Int                @id @default(autoincrement())
   ingredientName String
-  ingredientType ingredientType?
+  ingredientType ingredientTypeEnum
 
   createdBy String?
   user      User?   @relation(fields: [createdBy], references: [userId])
@@ -130,53 +146,53 @@ model UserTargetNutrient {
 }
 
 model Nutrient {
-  nutrientId   Int          @id @default(autoincrement())
-  nutrientName String       @unique
-  nutrientType nutrientType @default(macro)
-  nutrientUnit nutrientUnit @default(g)
+  nutrientId   Int              @id @default(autoincrement())
+  nutrientName String           @unique
+  nutrientType nutrientTypeEnum @default(macro)
+  nutrientUnit nutrientUnitEnum @default(g)
 
   ingredients IngredientNutrient[]
   users       UserTargetNutrient[]
 }
 
-enum nutrientType {
+enum nutrientTypeEnum {
   macro
   micro
 }
 
-enum nutrientUnit {
+enum nutrientUnitEnum {
   kCal
   g
   mg
   mcg
 }
 
-enum mealTime {
+enum mealTimeEnum {
   breakfast
   lunch
   dinner
   snack
 }
 
-enum mealType {
+enum mealTypeEnum {
   food
   fruit
   drink
   snack
 }
 
-enum gender {
+enum genderEnum {
   male
   female
   other
 }
 
-enum heightUnit {
+enum heightUnitEnum {
   m
   cm
 }
 
-enum ingredientUnit {
+enum ingredientUnitEnum {
   g
   tbsp // 18g
   tsp // 6g
@@ -184,7 +200,7 @@ enum ingredientUnit {
   dash // 0.4g
 }
 
-enum ingredientType {
+enum ingredientTypeEnum {
   meat
   vegetable
   milk
@@ -199,13 +215,14 @@ enum ingredientType {
   other
 }
 
-enum activityLevel {
+enum activityLevelEnum {
   low
   medium
   high
 }
 
-enum userRole {
+enum userRoleEnum {
   admin
   user
+  guest
 }

@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, mealTimeEnum } from '@prisma/client';
 import { CreateOrUpdateMealDto } from '../dtos/meal.dto';
 
 const prisma = new PrismaClient();
@@ -79,7 +79,7 @@ const createOrUpdateMealRepository = async (
   createMealRequest: CreateOrUpdateMealDto,
   id?: number | string
 ) => {
-  const { mealName, mealType, ingredients } = createMealRequest;
+  const { mealName, mealType, ingredients, mealTimes } = createMealRequest;
 
   if (id)
     return await prisma.meal.update({
@@ -89,6 +89,10 @@ const createOrUpdateMealRepository = async (
       data: {
         mealName,
         mealType,
+        availableMealTimes: {
+          deleteMany: {},
+          create: mealTimes,
+        },
         ingredients: {
           deleteMany: {},
           create: ingredients,
@@ -100,6 +104,9 @@ const createOrUpdateMealRepository = async (
     data: {
       mealName,
       mealType,
+      availableMealTimes: {
+        create: mealTimes,
+      },
       ingredients: {
         create: ingredients,
       },

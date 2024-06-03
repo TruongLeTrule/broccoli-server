@@ -1,4 +1,4 @@
-import { NextFunction, RequestHandler, Response } from 'express';
+import { NextFunction, RequestHandler } from 'express';
 import { UnauthenticatedError, UnauthorizedError } from '../utils/customErrors';
 import { verifyToken } from '../utils/token.util';
 import { IGetUserAuthInfoRequest } from '../../custom';
