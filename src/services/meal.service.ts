@@ -39,14 +39,16 @@ const handleMealNutrients = (ingredients: Array<MealIngredientPrisma>) => {
       );
 
       mealNutrients = handledNutrients.map(
-        ({ nutrientName, nutrientUnit, nutrientValue }) => ({
-          // Find and add nutrient value if nutrient name is equal
-          nutrientValue: (nutrientValue +=
-            mealNutrients.find((item) => item.nutrientName === nutrientName)
-              ?.nutrientValue || 0),
-          nutrientUnit,
-          nutrientName,
-        })
+        ({ nutrientName, nutrientUnit, nutrientValue }) => {
+          return {
+            // Find and add nutrient value if nutrient name is equal
+            nutrientValue: (nutrientValue +=
+              mealNutrients.find((item) => item.nutrientName === nutrientName)
+                ?.nutrientValue || 0),
+            nutrientUnit,
+            nutrientName,
+          };
+        }
       );
     }
   );
@@ -65,11 +67,16 @@ const findMealSpecificService = async (id: number) => {
     meal?.ingredients as Array<MealIngredientPrisma>
   );
 
+  const availableMealTimes = meal?.availableMealTimes.map(
+    ({ mealTime }) => mealTime
+  );
+
   return {
     mealName: meal?.mealName,
     imgURL: meal?.imgURL,
     mealType: meal?.mealType,
     nutrients: mealNutrients,
+    availableMealTimes,
     ingredients,
   };
 };

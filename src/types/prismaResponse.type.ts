@@ -1,25 +1,25 @@
 import {
-  nutrientUnit,
-  ingredientUnit,
-  ingredientType,
-  nutrientType,
+  nutrientUnitEnum,
+  ingredientUnitEnum,
+  ingredientTypeEnum,
+  nutrientTypeEnum,
 } from '@prisma/client';
 
 export interface MealIngredientPrisma {
   ingredientValue: number;
-  ingredientUnit: ingredientUnit;
+  ingredientUnit: ingredientUnitEnum;
   ingredientUnitCovert: {
     covertToGrams: number;
   };
   ingredient: {
     ingredientId: number;
     ingredientName: string;
-    ingredientType: ingredientType | null;
+    ingredientType: ingredientTypeEnum | null;
     nutrients: Array<{
       nutrientValueOn100g: number;
       nutrient: {
         nutrientName: string;
-        nutrientUnit: nutrientUnit;
+        nutrientUnit: nutrientUnitEnum;
       };
     }>;
   };
@@ -29,9 +29,9 @@ export interface IngredientNutrientPrisma {
   nutrientValueOn100g: number;
   nutrient: {
     nutrientId: number;
-    nutrientType: nutrientType;
+    nutrientType: nutrientTypeEnum;
     nutrientName: string;
-    nutrientUnit: nutrientUnit;
+    nutrientUnit: nutrientUnitEnum;
   };
 }
 
@@ -41,8 +41,8 @@ export interface UserTargetNutrientPrisma {
     nutrient: {
       nutrientId: number;
       nutrientName: string;
-      nutrientType: nutrientType;
-      nutrientUnit: nutrientUnit;
+      nutrientType: nutrientTypeEnum;
+      nutrientUnit: nutrientUnitEnum;
     };
   }>;
 }

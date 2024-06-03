@@ -1,7 +1,7 @@
-import { nutrientUnit } from '@prisma/client';
+import { nutrientUnitEnum } from '@prisma/client';
 
 export interface CleanMealNutrient {
   nutrientName: string;
-  nutrientUnit: nutrientUnit | null;
+  nutrientUnit: nutrientUnitEnum | null;
   nutrientValue: number;
 }

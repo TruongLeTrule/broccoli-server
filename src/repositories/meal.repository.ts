@@ -35,6 +35,7 @@ const findMealByIdRepository = async (mealId: number | string) => {
       mealName: true,
       mealType: true,
       imgURL: true,
+      availableMealTimes: true,
       ingredients: {
         select: {
           ingredientValue: true,
