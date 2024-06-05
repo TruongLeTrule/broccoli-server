@@ -68,24 +68,32 @@ model Meal {
   createdBy String?
   user      User?   @relation(fields: [createdBy], references: [userId])
 
-  ingredients        MealIngredient[]
-  chosenMeals        ChosenMeal[]
-  availableMealTimes MealTimeOfMeal[]
+  mealTimes   MealTime[]
+  ingredients MealIngredient[]
+  nutrients   MealNutrient[]
+  chosenMeals ChosenMeal[]
 }
 
-model MealTimeOfMeal {
-  id Int @id @default(autoincrement())
+model MealTime {
+  id       Int          @id @default(autoincrement())
+  mealTime mealTimeEnum
 
-  mealId        Int
-  meal          Meal          @relation(fields: [mealId], references: [mealId])
-  mealTime      mealTimeEnum
-  mealTimeOfDay MealTimeOfDay @relation(fields: [mealTime], references: [mealTime])
+  mealId Int
+  meal   Meal @relation(fields: [mealId], references: [mealId])
+
+  @@unique([mealTime, mealId])
 }
 
-model MealTimeOfDay {
-  mealTime mealTimeEnum @id
+model MealNutrient {
+  id            Int   @id @default(autoincrement())
+  nutrientValue Float
 
-  meals MealTimeOfMeal[]
+  mealId     Int
+  meal       Meal     @relation(fields: [mealId], references: [mealId])
+  nutrientId Int
+  nutrient   Nutrient @relation(fields: [nutrientId], references: [nutrientId])
+
+  @@unique([mealId, nutrientId])
 }
 
 model MealIngredient {
@@ -153,6 +161,7 @@ model Nutrient {
 
   ingredients IngredientNutrient[]
   users       UserTargetNutrient[]
+  meals       MealNutrient[]
 }
 
 enum nutrientTypeEnum {

@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 const findAllMealWithMealTimeRepository = () => {
   return prisma.meal.findMany({
     include: {
-      availableMealTimes: {
+      mealTimes: {
         select: {
           mealTime: true,
         },
@@ -47,27 +47,25 @@ const findMealByIdRepository = async (mealId: number | string) => {
       mealName: true,
       mealType: true,
       imgURL: true,
-      availableMealTimes: true,
+      mealTimes: {
+        select: {
+          mealTime: true,
+        },
+      },
+      nutrients: {
+        select: {
+          nutrientValue: true,
+          nutrient: true,
+        },
+      },
       ingredients: {
         select: {
           ingredientValue: true,
           ingredientUnit: true,
-          ingredientUnitCovert: {
-            select: {
-              covertToGrams: true,
-            },
-          },
           ingredient: {
             select: {
               ingredientId: true,
               ingredientName: true,
-              ingredientType: true,
-              nutrients: {
-                select: {
-                  nutrientValueOn100g: true,
-                  nutrient: true,
-                },
-              },
             },
           },
         },
@@ -92,7 +90,8 @@ const createOrUpdateMealRepository = async (
   createMealRequest: CreateOrUpdateMealDto,
   id?: number | string
 ) => {
-  const { mealName, mealType, ingredients, mealTimes } = createMealRequest;
+  const { mealName, mealType, ingredients, mealTimes, nutrients } =
+    createMealRequest;
 
   if (id)
     return await prisma.meal.update({
@@ -102,13 +101,17 @@ const createOrUpdateMealRepository = async (
       data: {
         mealName,
         mealType,
-        availableMealTimes: {
+        mealTimes: {
           deleteMany: {},
           create: mealTimes,
         },
         ingredients: {
           deleteMany: {},
           create: ingredients,
+        },
+        nutrients: {
+          deleteMany: {},
+          create: nutrients,
         },
       },
     });
@@ -117,11 +120,14 @@ const createOrUpdateMealRepository = async (
     data: {
       mealName,
       mealType,
-      availableMealTimes: {
+      mealTimes: {
         create: mealTimes,
       },
       ingredients: {
         create: ingredients,
+      },
+      nutrients: {
+        create: nutrients,
       },
     },
   });

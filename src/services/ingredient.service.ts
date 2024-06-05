@@ -1,8 +1,8 @@
 import { findIngredientByIdRepository } from '../repositories/ingredient.repository';
-import { IngredientNutrientPrisma } from '../types/prismaResponse.type';
+import { IngredientNutrientPrismaDto } from '../dtos/ingredient.dto';
 
 const cleanIngredientNutrients = (
-  nutrients: Array<IngredientNutrientPrisma> | undefined
+  nutrients: Array<IngredientNutrientPrismaDto> | undefined
 ) => {
   return nutrients?.map(({ nutrient, nutrientValueOn100g }) => ({
     nutrientValueOn100g,

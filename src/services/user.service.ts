@@ -1,7 +1,7 @@
 import { findUserTargetRepository } from '../repositories/user.repository';
-import { UserTargetNutrientPrisma } from '../types/prismaResponse.type';
+import { UserTargetNutrientPrismaDto } from '../dtos/user.dto';
 
-const cleanTargetNutrients = (nutrients: UserTargetNutrientPrisma) => {
+const cleanTargetNutrients = (nutrients: UserTargetNutrientPrismaDto) => {
   return nutrients.targetNutrients.map(({ nutrient, targetNutrientValue }) => {
     const { nutrientId, nutrientName, nutrientType, nutrientUnit } = nutrient;
     return {
@@ -17,7 +17,7 @@ const cleanTargetNutrients = (nutrients: UserTargetNutrientPrisma) => {
 const findUserTargetService = async (id: string) => {
   const nutrients = await findUserTargetRepository(id);
 
-  return cleanTargetNutrients(nutrients as UserTargetNutrientPrisma);
+  return cleanTargetNutrients(nutrients as UserTargetNutrientPrismaDto);
 };
 
 export { findUserTargetService };

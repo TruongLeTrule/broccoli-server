@@ -1,13 +1,18 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { findMealSpecificService } from '../services/meal.service';
+import {
+  calculateMealNutrientService,
+  cleanMealSpecificResponse,
+} from '../services/meal.service';
 import {
   findMealsPaginationRepository,
   findMealByNameRepository,
   createOrUpdateMealRepository,
   deleteMealRepository,
+  findMealByIdRepository,
 } from '../repositories/meal.repository';
 import { mealTimeEnum } from '@prisma/client';
+import { MealPrismaDto } from '../dtos/meal.dto';
 
 const findMealsController = async (req: Request, res: Response) => {
   const meals = await findMealsPaginationRepository(
@@ -19,9 +24,13 @@ const findMealsController = async (req: Request, res: Response) => {
 };
 
 const findMealByIdController = async (req: Request, res: Response) => {
-  const meal = await findMealSpecificService(parseInt(req.params.id));
+  const meal = await findMealByIdRepository(parseInt(req.params.id));
 
-  res.status(StatusCodes.OK).json({ meal });
+  res.status(StatusCodes.OK).json({
+    meal: {
+      ...cleanMealSpecificResponse(meal as MealPrismaDto),
+    },
+  });
 };
 
 const findMealByNameController = async (req: Request, res: Response) => {
@@ -31,12 +40,21 @@ const findMealByNameController = async (req: Request, res: Response) => {
 };
 
 const createMealController = async (req: Request, res: Response) => {
-  const mealTimes = req.body?.mealTimes.map((mealTime: mealTimeEnum) => ({
-    mealTime,
-  }));
-  const meal = await createOrUpdateMealRepository({ ...req.body, mealTimes });
+  let { mealTimes, ingredients, ...mealInfo } = req.body;
 
-  res.status(StatusCodes.CREATED).json({ msg: 'Meal created', meal });
+  const nutrients = await calculateMealNutrientService(ingredients);
+
+  const meal = await createOrUpdateMealRepository({
+    nutrients,
+    mealTimes: mealTimes.map((mealTime: mealTimeEnum) => ({ mealTime })),
+    ingredients,
+    ...mealInfo,
+  });
+
+  res.status(StatusCodes.CREATED).json({
+    msg: 'Meal created',
+    meal,
+  });
 };
 
 const deleteMealController = async (req: Request, res: Response) => {
@@ -46,15 +64,24 @@ const deleteMealController = async (req: Request, res: Response) => {
 };
 
 const updateMealController = async (req: Request, res: Response) => {
-  const mealTimes = req.body?.mealTimes.map((mealTime: mealTimeEnum) => ({
-    mealTime,
-  }));
+  let { mealTimes, ingredients, ...mealInfo } = req.body;
+
+  const nutrients = await calculateMealNutrientService(ingredients);
+
   const meal = await createOrUpdateMealRepository(
-    { ...req.body, mealTimes },
-    parseInt(req.params.id)
+    {
+      nutrients,
+      mealTimes: mealTimes.map((mealTime: mealTimeEnum) => ({ mealTime })),
+      ingredients,
+      ...mealInfo,
+    },
+    req.params.id
   );
 
-  res.status(StatusCodes.OK).json({ msg: 'Meal updated', meal });
+  res.status(StatusCodes.CREATED).json({
+    msg: 'Meal updated',
+    meal,
+  });
 };
 
 export {
