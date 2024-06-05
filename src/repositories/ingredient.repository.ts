@@ -32,10 +32,10 @@ const findIngredientByNameRepository = async (ingredientName: string) => {
   return ingredients;
 };
 
-const findIngredientByIdRepository = async (ingredientId: string | number) => {
+const findIngredientByIdRepository = async (ingredientId: number) => {
   return await prisma.ingredient.findFirst({
     where: {
-      ingredientId: Number(ingredientId),
+      ingredientId,
     },
     include: {
       nutrients: {
@@ -46,6 +46,28 @@ const findIngredientByIdRepository = async (ingredientId: string | number) => {
       },
     },
   });
+};
+
+const findManyIngredientNutrientRepository = async (
+  ingredientIds: Array<number>
+) => {
+  return prisma.ingredient.findMany({
+    where: {
+      ingredientId: { in: ingredientIds },
+    },
+    select: {
+      nutrients: {
+        select: {
+          nutrientValueOn100g: true,
+          nutrientId: true,
+        },
+      },
+    },
+  });
+};
+
+const findUnitCovertRepository = async () => {
+  return prisma.ingredientUnitCovert.findMany({});
 };
 
 const createOrUpdateIngredientRepository = async (
@@ -95,4 +117,6 @@ export {
   deleteIngredientRepository,
   createOrUpdateIngredientRepository,
   findUniqueIngredientsRepository,
+  findManyIngredientNutrientRepository,
+  findUnitCovertRepository,
 };

@@ -1,84 +1,81 @@
-import { findMealByIdRepository } from '../repositories/meal.repository';
-import { MealIngredientPrisma } from '../types/prismaResponse.type';
-import { CleanMealNutrient } from '../types/cleanResponse.type';
+import { MealPrismaDto } from '../dtos/meal.dto';
+import {
+  findManyIngredientNutrientRepository,
+  findUnitCovertRepository,
+} from '../repositories/ingredient.repository';
+import { ingredientUnitEnum } from '@prisma/client';
 
-const cleanMealIngredients = (ingredients: Array<MealIngredientPrisma>) => {
-  return ingredients.map(({ ingredientUnit, ingredientValue, ingredient }) => {
-    const { ingredientId, ingredientName, ingredientType } = ingredient;
-    return {
-      ingredientUnit,
-      ingredientValue,
-      ingredientId,
-      ingredientName,
-      ingredientType,
-    };
-  });
-};
+const calculateMealNutrientService = async (
+  ingredients: Array<{
+    ingredientId: number;
+    ingredientUnit: ingredientUnitEnum;
+    ingredientValue: number;
+  }>
+) => {
+  let mealNutrients: Array<{
+    nutrientId: number;
+    nutrientValue: number;
+  }> = [];
+  const ingredientIds = ingredients.map(({ ingredientId }) => ingredientId);
+  const nutrients = await findManyIngredientNutrientRepository(ingredientIds);
+  const unitCovert = await findUnitCovertRepository();
 
-const handleMealNutrients = (ingredients: Array<MealIngredientPrisma>) => {
-  let mealNutrients: Array<CleanMealNutrient> = [];
+  const ingredientsWithNutrients = ingredients.map(
+    ({ ingredientValue, ingredientUnit }, index) => {
+      return {
+        ingredientValue,
+        covertToGrams:
+          unitCovert.find(
+            (unitCovert) => unitCovert.ingredientUnit === ingredientUnit
+          )?.covertToGrams || 1,
+        nutrients: nutrients[index].nutrients,
+      };
+    }
+  );
 
-  ingredients.forEach(
-    ({ ingredient, ingredientValue, ingredientUnitCovert }) => {
-      const { nutrients } = ingredient;
-
+  ingredientsWithNutrients.forEach(
+    ({ nutrients, ingredientValue, covertToGrams }) => {
+      // Calculate nutrient base on ingredient value in meal
       const handledNutrients = nutrients.map(
-        ({ nutrientValueOn100g, nutrient }) => {
-          const { nutrientName, nutrientUnit } = nutrient;
+        ({ nutrientValueOn100g, nutrientId }) => {
           return {
-            nutrientName,
-            nutrientUnit,
-            // meal nutrient value base on meal weight in gram
+            nutrientId,
             nutrientValue:
-              (ingredientValue *
-                ingredientUnitCovert.covertToGrams *
-                nutrientValueOn100g) /
-              100,
+              (ingredientValue * covertToGrams * nutrientValueOn100g) / 100,
           };
         }
       );
-
-      mealNutrients = handledNutrients.map(
-        ({ nutrientName, nutrientUnit, nutrientValue }) => {
-          return {
-            // Find and add nutrient value if nutrient name is equal
-            nutrientValue: (nutrientValue +=
-              mealNutrients.find((item) => item.nutrientName === nutrientName)
-                ?.nutrientValue || 0),
-            nutrientUnit,
-            nutrientName,
-          };
-        }
-      );
+      // Add value to meal nutrient, if no nutrient value yet assign to 0
+      mealNutrients = handledNutrients.map(({ nutrientId, nutrientValue }) => {
+        const currMealNutrientValue = mealNutrients.find(
+          (item) => item.nutrientId === nutrientId
+        )?.nutrientValue;
+        return {
+          nutrientId,
+          nutrientValue: (nutrientValue += currMealNutrientValue || 0),
+        };
+      });
     }
   );
 
   return mealNutrients;
 };
 
-const findMealSpecificService = async (id: number) => {
-  const meal = await findMealByIdRepository(id);
-
-  const ingredients = cleanMealIngredients(
-    meal?.ingredients as Array<MealIngredientPrisma>
-  );
-
-  const mealNutrients: Array<CleanMealNutrient> = handleMealNutrients(
-    meal?.ingredients as Array<MealIngredientPrisma>
-  );
-
-  const availableMealTimes = meal?.availableMealTimes.map(
-    ({ mealTime }) => mealTime
-  );
+const cleanMealSpecificResponse = (prismaRes: MealPrismaDto) => {
+  const { mealTimes, ingredients, nutrients, ...mealProps } = prismaRes;
 
   return {
-    mealName: meal?.mealName,
-    imgURL: meal?.imgURL,
-    mealType: meal?.mealType,
-    nutrients: mealNutrients,
-    availableMealTimes,
-    ingredients,
+    ...mealProps,
+    mealTimes: mealTimes.map(({ mealTime }) => mealTime),
+    ingredients: ingredients.map(({ ingredient, ...ingredientInfo }) => ({
+      ...ingredientInfo,
+      ...ingredient,
+    })),
+    nutrients: nutrients.map(({ nutrientValue, nutrient }) => ({
+      nutrientValue,
+      ...nutrient,
+    })),
   };
 };
 
-export { findMealSpecificService };
+export { calculateMealNutrientService, cleanMealSpecificResponse };
