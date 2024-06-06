@@ -16,7 +16,7 @@ model User {
   role     userRoleEnum
   imgUrl   String?
 
-  mealPlans          ChosenMeal[]
+  mealPlans          MealPlan[]
   createdMeals       Meal[]
   createdIngredients Ingredient[]
   targetNutrients    UserTargetNutrient[]
@@ -45,18 +45,37 @@ model ActivityLevel {
   userPhysicalStats UserPhysicalStat[]
 }
 
+model MealPlan {
+  mealPlanId  String   @id @default(uuid())
+  appliedDate DateTime
+
+  user        User               @relation(fields: [userId], references: [userId])
+  userId      String
+  chosenMeals ChosenMeal[]
+  nutrients   MealPlanNutrient[]
+}
+
+model MealPlanNutrient {
+  id            String @id @default(uuid())
+  nutrientValue Float
+
+  mealPlanId String
+  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
+  nutrientId Int
+  nutrient   Nutrient @relation(fields: [nutrientId], references: [nutrientId])
+}
+
 model ChosenMeal {
   chosenMealId String       @id @default(uuid())
   mealTime     mealTimeEnum
   quantity     Float
-  appliedDate  DateTime
 
-  meal   Meal   @relation(fields: [mealId], references: [mealId])
-  mealId Int
-  users  User?  @relation(fields: [userId], references: [userId])
-  userId String
+  meal       Meal     @relation(fields: [mealId], references: [mealId])
+  mealId     Int
+  mealPlanId String
+  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
 
-  @@unique([userId, mealTime, appliedDate])
+  @@unique([mealPlanId, mealTime])
 }
 
 model Meal {
@@ -68,20 +87,27 @@ model Meal {
   createdBy String?
   user      User?   @relation(fields: [createdBy], references: [userId])
 
-  mealTimes   MealTime[]
+  mealTimes   MealTimesOfMeal[]
   ingredients MealIngredient[]
   nutrients   MealNutrient[]
   chosenMeals ChosenMeal[]
 }
 
-model MealTime {
-  id       Int          @id @default(autoincrement())
-  mealTime mealTimeEnum
+model MealTimesOfMeal {
+  id Int @id @default(autoincrement())
 
-  mealId Int
-  meal   Meal @relation(fields: [mealId], references: [mealId])
+  mealTime          mealTimeEnum
+  mealTimeReference MealTime     @relation(fields: [mealTime], references: [mealTime])
+  mealId            Int
+  meal              Meal         @relation(fields: [mealId], references: [mealId])
 
   @@unique([mealTime, mealId])
+}
+
+model MealTime {
+  mealTime mealTimeEnum @id
+
+  meals MealTimesOfMeal[]
 }
 
 model MealNutrient {
@@ -162,6 +188,7 @@ model Nutrient {
   ingredients IngredientNutrient[]
   users       UserTargetNutrient[]
   meals       MealNutrient[]
+  mealPlans   MealPlanNutrient[]
 }
 
 enum nutrientTypeEnum {

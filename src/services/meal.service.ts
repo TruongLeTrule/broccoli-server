@@ -35,6 +35,7 @@ const calculateMealNutrientService = async (
 
   ingredientsWithNutrients.forEach(
     ({ nutrients, ingredientValue, covertToGrams }) => {
+      if (!nutrients.length) return;
       // Calculate nutrient base on ingredient value in meal
       const handledNutrients = nutrients.map(
         ({ nutrientValueOn100g, nutrientId }) => {

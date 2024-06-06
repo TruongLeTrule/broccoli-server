@@ -3,18 +3,6 @@ import { CreateOrUpdateMealDto } from '../dtos/meal.dto';
 
 const prisma = new PrismaClient();
 
-const findAllMealWithMealTimeRepository = () => {
-  return prisma.meal.findMany({
-    include: {
-      mealTimes: {
-        select: {
-          mealTime: true,
-        },
-      },
-    },
-  });
-};
-
 const findUniqueMealRepository = (id: string | number) => {
   return prisma.meal.findUnique({
     where: {
@@ -24,8 +12,8 @@ const findUniqueMealRepository = (id: string | number) => {
 };
 
 const findMealsPaginationRepository = async (
-  page: number | undefined,
-  limit: number | undefined
+  page?: number | undefined,
+  limit?: number | undefined
 ) => {
   if (!page) return await prisma.meal.findMany();
 
@@ -39,7 +27,7 @@ const findMealsPaginationRepository = async (
 };
 
 const findMealByIdRepository = async (mealId: number | string) => {
-  const meal = await prisma.meal.findFirst({
+  return await prisma.meal.findFirst({
     where: {
       mealId: Number(mealId),
     },
@@ -72,7 +60,23 @@ const findMealByIdRepository = async (mealId: number | string) => {
       },
     },
   });
-  return meal;
+};
+
+const findManyMealNutrientRepository = async (mealIds: Array<number>) => {
+  return await prisma.meal.findMany({
+    where: {
+      mealId: { in: mealIds },
+    },
+    select: {
+      mealId: true,
+      nutrients: {
+        select: {
+          nutrientValue: true,
+          nutrient: true,
+        },
+      },
+    },
+  });
 };
 
 const findMealByNameRepository = async (mealName: string) => {
@@ -141,6 +145,31 @@ const deleteMealRepository = async (id: number | string) => {
   });
 };
 
+const findMealWithMealTimesRepository = async () => {
+  return prisma.mealTime.findMany({
+    select: {
+      mealTime: true,
+      meals: {
+        select: {
+          meal: {
+            select: {
+              mealId: true,
+              mealName: true,
+              imgURL: true,
+              nutrients: {
+                select: {
+                  nutrientValue: true,
+                  nutrient: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
 export {
   findMealsPaginationRepository,
   findMealByIdRepository,
@@ -148,5 +177,6 @@ export {
   createOrUpdateMealRepository,
   deleteMealRepository,
   findUniqueMealRepository,
-  findAllMealWithMealTimeRepository,
+  findMealWithMealTimesRepository,
+  findManyMealNutrientRepository,
 };
