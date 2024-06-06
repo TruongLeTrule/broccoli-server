@@ -1,5 +1,5 @@
 import express from 'express';
-import { createDayPlanController } from '../controllers/planner.controller';
+import { createDayPlanController } from '../controllers/mealPlan.controller';
 
 const router = express.Router();
 
