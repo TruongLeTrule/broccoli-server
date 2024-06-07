@@ -42,6 +42,11 @@ const updateRelevantMealsOnUpdateService = async (
 
   // Calculate relevant meal nutrient with updated ingredient
   for (const mealIngredient of ingredientsGroupedByMeal) {
+    console.log(
+      '============= meal id:',
+      mealIngredient.mealId,
+      '==================='
+    );
     updatedMealNutrients.push({
       mealId: mealIngredient.mealId,
       nutrients: await calculateMealNutrientService(mealIngredient.ingredients),
@@ -54,6 +59,8 @@ const updateRelevantMealsOnUpdateService = async (
       updateMealNutrient(mealId, nutrients)
     )
   );
+
+  console.log('relevant meals: ', mealIds);
 
   return result;
 };

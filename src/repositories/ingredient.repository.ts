@@ -73,6 +73,7 @@ const findManyIngredientNutrientRepository = async (
       ingredientId: { in: ingredientIds },
     },
     select: {
+      ingredientId: true,
       nutrients: {
         select: {
           nutrientValueOn100g: true,

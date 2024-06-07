@@ -21,24 +21,39 @@ const calculateMealNutrientService = async (
   const unitCovert = await findUnitCovertRepository();
 
   const ingredientsWithNutrients = ingredients.map(
-    ({ ingredientValue, ingredientUnit }, index) => {
+    ({ ingredientValue, ingredientUnit, ingredientId }) => {
+      const ingredientNutrient = nutrients.find(
+        (item) => item.ingredientId === ingredientId
+      );
       return {
+        ingredientId,
         ingredientValue,
         covertToGrams:
           unitCovert.find(
             (unitCovert) => unitCovert.ingredientUnit === ingredientUnit
           )?.covertToGrams || 1,
-        nutrients: nutrients[index].nutrients,
+        nutrients: ingredientNutrient?.nutrients,
       };
     }
   );
 
   ingredientsWithNutrients.forEach(
-    ({ nutrients, ingredientValue, covertToGrams }) => {
-      if (!nutrients.length) return;
+    ({ nutrients, ingredientValue, covertToGrams, ingredientId }) => {
+      console.log('======================================');
+      console.log('ingredient id: ', ingredientId);
+
+      if (!nutrients?.length) return;
       // Calculate nutrient base on ingredient value in meal
       const handledNutrients = nutrients.map(
         ({ nutrientValueOn100g, nutrientId }) => {
+          if (nutrientId === 1)
+            console.log(
+              'ingredient value, covert ratio, nutrient value, calo: ',
+              ingredientValue,
+              covertToGrams,
+              nutrientValueOn100g,
+              (ingredientValue * covertToGrams * nutrientValueOn100g) / 100
+            );
           return {
             nutrientId,
             nutrientValue:
