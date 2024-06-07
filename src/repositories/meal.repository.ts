@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { CreateOrUpdateMealDto } from '../dtos/meal.dto';
+import { CreateOrUpdateMealDto, MealNutrientDto } from '../dtos/meal.dto';
 
 const prisma = new PrismaClient();
 
@@ -90,6 +90,24 @@ const findMealByNameRepository = async (mealName: string) => {
   return meals;
 };
 
+const findMealIngredients = async (mealIds: Array<number>) => {
+  return await prisma.meal.findMany({
+    where: {
+      mealId: { in: mealIds },
+    },
+    select: {
+      mealId: true,
+      ingredients: {
+        select: {
+          ingredientId: true,
+          ingredientUnit: true,
+          ingredientValue: true,
+        },
+      },
+    },
+  });
+};
+
 const createOrUpdateMealRepository = async (
   createMealRequest: CreateOrUpdateMealDto,
   id?: number | string
@@ -170,6 +188,23 @@ const findMealWithMealTimesRepository = async () => {
   });
 };
 
+const updateMealNutrient = (
+  mealId: number,
+  nutrients: Array<MealNutrientDto>
+) => {
+  return prisma.meal.update({
+    where: {
+      mealId,
+    },
+    data: {
+      nutrients: {
+        deleteMany: {},
+        create: nutrients,
+      },
+    },
+  });
+};
+
 export {
   findMealsPaginationRepository,
   findMealByIdRepository,
@@ -179,4 +214,6 @@ export {
   findUniqueMealRepository,
   findMealWithMealTimesRepository,
   findManyMealNutrientRepository,
+  updateMealNutrient,
+  findMealIngredients,
 };

@@ -18,10 +18,12 @@ export interface CreateOrUpdateMealDto {
     ingredientValue: number;
     ingredientUnit: ingredientUnitEnum;
   }>;
-  nutrients: Array<{
-    nutrientId: number;
-    nutrientValue: number;
-  }>;
+  nutrients: Array<MealNutrientDto>;
+}
+
+export interface MealNutrientDto {
+  nutrientId: number;
+  nutrientValue: number;
 }
 
 export interface MealIngredientPrismaDto {

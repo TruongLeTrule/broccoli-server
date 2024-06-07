@@ -1,9 +1,13 @@
-import { findIngredientSpecificService } from '../services/ingredient.service';
+import {
+  findIngredientSpecificService,
+  updateRelevantMealsOnUpdateService,
+} from '../services/ingredient.service';
 import {
   findIngredientsRepository,
   findIngredientByNameRepository,
   createOrUpdateIngredientRepository,
   deleteIngredientRepository,
+  findRelevantMeals,
 } from '../repositories/ingredient.repository';
 import { StatusCodes } from 'http-status-codes';
 import { Request, Response } from 'express';
@@ -42,7 +46,17 @@ const updateIngredientController = async (req: Request, res: Response) => {
     parseInt(req.params.id)
   );
 
-  res.status(StatusCodes.OK).json({ msg: 'Ingredient updated', ingredient });
+  const relevantMeals = (
+    await findRelevantMeals(ingredient.ingredientId)
+  )?.meals.map(({ mealId }) => mealId);
+
+  const updatedMeals = await updateRelevantMealsOnUpdateService(relevantMeals);
+
+  res.status(StatusCodes.OK).json({
+    msg: 'Ingredient updated',
+    ingredient,
+    updatedMeals,
+  });
 };
 
 const deleteIngredientController = async (req: Request, res: Response) => {
