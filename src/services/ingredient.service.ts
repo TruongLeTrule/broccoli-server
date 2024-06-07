@@ -1,5 +1,14 @@
 import { findIngredientByIdRepository } from '../repositories/ingredient.repository';
 import { IngredientNutrientPrismaDto } from '../dtos/ingredient.dto';
+import {
+  findMealIngredients,
+  updateMealNutrient,
+} from '../repositories/meal.repository';
+import { MealNutrientDto } from '../dtos/meal.dto';
+import { calculateMealNutrientService } from './meal.service';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 const cleanIngredientNutrients = (
   nutrients: Array<IngredientNutrientPrismaDto> | undefined
@@ -18,4 +27,35 @@ const findIngredientSpecificService = async (id: number) => {
   return { ...ingredient, nutrients: flatNutrients };
 };
 
-export { findIngredientSpecificService };
+const updateRelevantMealsOnUpdateService = async (
+  mealIds: Array<number> | undefined
+) => {
+  const updatedMealNutrients: Array<{
+    mealId: number;
+    nutrients: Array<MealNutrientDto>;
+  }> = [];
+
+  if (!mealIds || !mealIds?.length) return;
+
+  // Find relevant meals with its id, ingredients
+  const ingredientsGroupedByMeal = await findMealIngredients(mealIds);
+
+  // Calculate relevant meal nutrient with updated ingredient
+  for (const mealIngredient of ingredientsGroupedByMeal) {
+    updatedMealNutrients.push({
+      mealId: mealIngredient.mealId,
+      nutrients: await calculateMealNutrientService(mealIngredient.ingredients),
+    });
+  }
+
+  // Update all relevant meals nutrients in db
+  const result = await prisma.$transaction(
+    updatedMealNutrients.map(({ mealId, nutrients }) =>
+      updateMealNutrient(mealId, nutrients)
+    )
+  );
+
+  return result;
+};
+
+export { findIngredientSpecificService, updateRelevantMealsOnUpdateService };

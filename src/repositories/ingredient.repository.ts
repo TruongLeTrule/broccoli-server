@@ -3,10 +3,27 @@ import { CreateOrUpdateIngredientDto } from '../dtos/ingredient.dto';
 
 const prisma = new PrismaClient();
 
-const findUniqueIngredientsRepository = async (id: string | number) => {
+const findRelevantMeals = async (ingredientId: string | number) => {
+  return await prisma.ingredient.findFirst({
+    where: {
+      ingredientId: Number(ingredientId),
+    },
+    select: {
+      meals: {
+        select: {
+          mealId: true,
+        },
+      },
+    },
+  });
+};
+
+const findUniqueIngredientsRepository = async (
+  ingredientId: string | number
+) => {
   return await prisma.ingredient.findUnique({
     where: {
-      ingredientId: Number(id),
+      ingredientId: Number(ingredientId),
     },
   });
 };
@@ -119,4 +136,5 @@ export {
   findUniqueIngredientsRepository,
   findManyIngredientNutrientRepository,
   findUnitCovertRepository,
+  findRelevantMeals,
 };
