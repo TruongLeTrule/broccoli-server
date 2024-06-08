@@ -47,7 +47,7 @@ model ActivityLevel {
 
 model MealPlan {
   mealPlanId  String   @id @default(uuid())
-  appliedDate DateTime
+  appliedDate DateTime @unique
 
   user        User               @relation(fields: [userId], references: [userId])
   userId      String
@@ -60,7 +60,7 @@ model MealPlanNutrient {
   nutrientValue Float
 
   mealPlanId String
-  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
+  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [mealPlanId], onDelete: Cascade)
   nutrientId Int
   nutrient   Nutrient @relation(fields: [nutrientId], references: [nutrientId])
 }
@@ -70,12 +70,12 @@ model ChosenMeal {
   mealTime     mealTimeEnum
   quantity     Float
 
-  meal       Meal     @relation(fields: [mealId], references: [mealId])
+  meal       Meal     @relation(fields: [mealId], references: [mealId], onDelete: Cascade)
   mealId     Int
   mealPlanId String
-  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [mealPlanId])
+  mealPlan   MealPlan @relation(fields: [mealPlanId], references: [mealPlanId], onDelete: Cascade)
 
-  @@unique([mealPlanId, mealTime])
+  @@unique([mealTime, mealId, mealPlanId])
 }
 
 model Meal {

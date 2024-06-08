@@ -8,9 +8,8 @@ export const authenticateMiddleware = (
   _: any,
   next: NextFunction
 ) => {
-  const { token } = req.cookies;
-
-  if (!token) throw new UnauthenticatedError('authentication invalid');
+  if (!req.cookies.token)
+    throw new UnauthenticatedError('authentication invalid');
 
   try {
     const user = verifyToken(req.cookies.token);

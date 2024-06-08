@@ -3,6 +3,7 @@ import {
   loginController,
   logoutController,
   registerController,
+  loginGuestController,
 } from '../controllers/auth.controller';
 import {
   validateLogin,
@@ -19,5 +20,6 @@ router
   .route('/register')
   .post([...validateRegister, checkValidation], registerController);
 router.route('/logout').get(logoutController);
+router.route('/login-guest').get(loginGuestController);
 
 export default router;

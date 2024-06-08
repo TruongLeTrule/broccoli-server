@@ -53,4 +53,26 @@ const logoutController = async (_: any, res: Response) => {
   res.status(StatusCodes.OK).json({ msg: 'logged out successful' });
 };
 
-export { loginController, registerController, logoutController };
+const loginGuestController = async (_: any, res: Response) => {
+  const guestUser = await findUserByUsernameRepository('somebody');
+
+  const token = createToken({
+    userId: guestUser?.userId,
+    role: guestUser?.role,
+  });
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    expires: new Date(Date.now() + oneDay),
+    secure: process.env.NODE_ENV === 'production',
+  });
+
+  res.status(StatusCodes.OK).json({ msg: 'login guest successful', guestUser });
+};
+
+export {
+  loginController,
+  registerController,
+  logoutController,
+  loginGuestController,
+};

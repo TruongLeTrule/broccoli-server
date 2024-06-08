@@ -42,7 +42,7 @@ app.use(`${BASE_URL}/auth`, authRoute);
 app.use(`${BASE_URL}/meals`, mealRoute);
 app.use(`${BASE_URL}/ingredients`, ingredientRoute);
 app.use(`${BASE_URL}/nutrients`, nutrientRoute);
-app.use(`${BASE_URL}/planner`, plannerRoute);
+app.use(`${BASE_URL}/planner`, authenticateMiddleware, plannerRoute);
 app.use(`${BASE_URL}/user`, authenticateMiddleware, userRoute);
 
 // Error handlers

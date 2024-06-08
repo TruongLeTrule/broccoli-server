@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, mealTimeEnum } from '@prisma/client';
 import { CreateOrUpdateMealDto, MealNutrientDto } from '../dtos/meal.dto';
 
 const prisma = new PrismaClient();
@@ -188,6 +188,34 @@ const findMealWithMealTimesRepository = async () => {
   });
 };
 
+const findMealByMealTimesRepository = async (mealTime: mealTimeEnum) => {
+  return prisma.mealTime.findUnique({
+    where: {
+      mealTime,
+    },
+    select: {
+      mealTime: true,
+      meals: {
+        select: {
+          meal: {
+            select: {
+              mealId: true,
+              mealName: true,
+              imgURL: true,
+              nutrients: {
+                select: {
+                  nutrientValue: true,
+                  nutrient: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
 const updateMealNutrient = (
   mealId: number,
   nutrients: Array<MealNutrientDto>
@@ -216,4 +244,5 @@ export {
   findManyMealNutrientRepository,
   updateMealNutrient,
   findMealIngredients,
+  findMealByMealTimesRepository,
 };

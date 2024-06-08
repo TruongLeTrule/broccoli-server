@@ -8,9 +8,11 @@ export interface MealPlanDto {
 }
 
 export interface ChosenMealDto {
+  mealId: number | undefined;
+  mealName: string | undefined;
   mealTime: mealTimeEnum;
-  mealId: number;
   quantity: number;
+  imgURL: string | undefined | null;
 }
 
 export interface MealPlanNutrientDto {

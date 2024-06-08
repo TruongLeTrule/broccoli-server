@@ -1,27 +1,116 @@
 import {
   findMealWithMealTimesRepository,
   findManyMealNutrientRepository,
+  findMealByMealTimesRepository,
 } from '../repositories/meal.repository';
 import {
   ChosenMealDto,
   MealPlanNutrientDto,
   ExistMealsDto,
 } from '../dtos/mealPlan.dto';
+import {
+  createDayPlanRepository,
+  deleteChosenMealRepository,
+  findMealPlanRepository,
+  updateDayPlanRepository,
+} from '../repositories/mealPlan.repository';
+import { mealTimeEnum } from '@prisma/client';
 
-const createDayPlanService = async (
-  calories: number,
+const updateOneMealService = async (
   existMeals: ExistMealsDto,
+  appliedDate: Date,
+  mealId: number,
+  mealTime: mealTimeEnum,
   userId: string
 ) => {
+  const mealPlan = await findMealPlanRepository(appliedDate, userId);
+
+  await deleteChosenMealRepository(
+    mealId,
+    mealPlan?.mealPlanId as string,
+    mealTime
+  );
+
+  const updatedMealPlan = await findMealPlanRepository(appliedDate, userId);
+
+  const chosenMeals = updatedMealPlan?.chosenMeals.map(
+    ({ meal, ...mealInfo }) => ({
+      ...meal,
+      ...mealInfo,
+    })
+  );
+
+  const newMeal = await chooseMealsInMealTime(mealTime);
+
+  const nutrients = await calculateMealPlanNutrient([
+    ...(chosenMeals as Array<ChosenMealDto>),
+    ...newMeal,
+  ]);
+
+  const mealPlanWithNewMeals = await updateDayPlanRepository({
+    chosenMeals: [...(chosenMeals as Array<ChosenMealDto>), ...newMeal],
+    nutrients,
+    userId,
+    appliedDate,
+  });
+
+  return {
+    newMealPlan: mealPlanWithNewMeals,
+    chosenMeals: [...(chosenMeals as Array<ChosenMealDto>), ...newMeal],
+    nutrients,
+  };
+};
+
+const chooseMealsInMealTime = async (
+  mealTime: mealTimeEnum
+): Promise<Array<ChosenMealDto>> => {
+  const mealsByMealTime = await findMealByMealTimesRepository(mealTime);
+
+  const chosenMeals: Array<ChosenMealDto> = [];
+
+  const chosenMealId = chooseRandomMeal(
+    mealsByMealTime?.meals.map(({ meal }) => meal.mealId) as Array<number>,
+    []
+  );
+
+  const chosenMeal = mealsByMealTime?.meals.find(
+    (meal) => meal.meal.mealId === chosenMealId
+  )?.meal;
+
+  chosenMeals.push({
+    mealId: chosenMeal?.mealId,
+    mealName: chosenMeal?.mealName,
+    imgURL: chosenMeal?.imgURL,
+    quantity: 1,
+    mealTime,
+  });
+
+  return chosenMeals;
+};
+
+const createDayPlanService = async (
+  calories: number | undefined,
+  existMeals: ExistMealsDto,
+  appliedDate: Date,
+  userId: string
+) => {
+  if (calories === undefined) return;
+
   const chosenMeals = await chooseMeals(calories, existMeals);
 
   const nutrients = await calculateMealPlanNutrient(chosenMeals);
 
+  const mealPlan = await createDayPlanRepository({
+    chosenMeals,
+    appliedDate,
+    userId,
+    nutrients,
+  });
+
   return {
+    mealPlan,
     chosenMeals,
     nutrients,
-    appliedDate: new Date(Date.now()),
-    userId,
   };
 };
 
@@ -34,9 +123,9 @@ const chooseMeals = async (
 
   const chosenMeals: Array<ChosenMealDto> = [];
 
-  while (targetCalories < calories) {
+  while (targetCalories < calories - 100) {
     mealTimes.forEach(({ mealTime, meals }) => {
-      if (targetCalories >= calories) return;
+      if (targetCalories >= calories - 100) return;
 
       // If exist meals reach limit or undefined, set it []
       if (
@@ -50,6 +139,10 @@ const chooseMeals = async (
         existMeals[mealTime]
       );
 
+      const chosenMeal = meals.find(
+        (meal) => meal.meal.mealId === chosenMealId
+      )?.meal;
+
       existMeals[mealTime].push(chosenMealId);
 
       // If meal already in choosing list, quantity += 1
@@ -58,7 +151,9 @@ const chooseMeals = async (
       );
       if (existChosenMealIndex === -1) {
         chosenMeals.push({
-          mealId: chosenMealId,
+          mealId: chosenMeal?.mealId,
+          mealName: chosenMeal?.mealName,
+          imgURL: chosenMeal?.imgURL,
           quantity: 1,
           mealTime,
         });
@@ -94,7 +189,9 @@ const calculateMealPlanNutrient = async (
 ): Promise<Array<MealPlanNutrientDto>> => {
   const chosenMealIds = chosenMeals.map(({ mealId }) => mealId);
 
-  const chosenMealsNutrient = await getChosenMealNutrient(chosenMealIds);
+  const chosenMealsNutrient = await getChosenMealNutrient(
+    chosenMealIds as Array<number>
+  );
 
   let mealPlanNutrients: Array<MealPlanNutrientDto> = [];
 
@@ -133,4 +230,30 @@ const getChosenMealNutrient = async (selectedMealIds: Array<number>) => {
   );
 };
 
-export { createDayPlanService };
+const updateDayPlanService = async (
+  calories: number | undefined,
+  existMeals: ExistMealsDto,
+  appliedDate: Date,
+  userId: string
+) => {
+  if (calories === undefined) return;
+
+  const chosenMeals = await chooseMeals(calories, existMeals);
+
+  const nutrients = await calculateMealPlanNutrient(chosenMeals);
+
+  const mealPlan = await updateDayPlanRepository({
+    chosenMeals,
+    appliedDate,
+    userId,
+    nutrients,
+  });
+
+  return {
+    mealPlan,
+    chosenMeals,
+    nutrients,
+  };
+};
+
+export { createDayPlanService, updateDayPlanService, updateOneMealService };
